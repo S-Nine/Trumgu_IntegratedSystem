@@ -1,0 +1,10 @@
+/home/snine/workspace/dotnet_core/web/Trumgu_IntegratedManageSystem/bin/Debug/netcoreapp2.0/Trumgu_IntegratedManageSystem.deps.json
+/home/snine/workspace/dotnet_core/web/Trumgu_IntegratedManageSystem/bin/Debug/netcoreapp2.0/Trumgu_IntegratedManageSystem.runtimeconfig.json
+/home/snine/workspace/dotnet_core/web/Trumgu_IntegratedManageSystem/bin/Debug/netcoreapp2.0/Trumgu_IntegratedManageSystem.runtimeconfig.dev.json
+/home/snine/workspace/dotnet_core/web/Trumgu_IntegratedManageSystem/bin/Debug/netcoreapp2.0/Trumgu_IntegratedManageSystem.dll
+/home/snine/workspace/dotnet_core/web/Trumgu_IntegratedManageSystem/bin/Debug/netcoreapp2.0/Trumgu_IntegratedManageSystem.pdb
+/home/snine/workspace/dotnet_core/web/Trumgu_IntegratedManageSystem/obj/Debug/netcoreapp2.0/Trumgu_IntegratedManageSystem.csproj.CoreCompileInputs.cache
+/home/snine/workspace/dotnet_core/web/Trumgu_IntegratedManageSystem/obj/Debug/netcoreapp2.0/Trumgu_IntegratedManageSystem.AssemblyInfoInputs.cache
+/home/snine/workspace/dotnet_core/web/Trumgu_IntegratedManageSystem/obj/Debug/netcoreapp2.0/Trumgu_IntegratedManageSystem.AssemblyInfo.cs
+/home/snine/workspace/dotnet_core/web/Trumgu_IntegratedManageSystem/obj/Debug/netcoreapp2.0/Trumgu_IntegratedManageSystem.dll
+/home/snine/workspace/dotnet_core/web/Trumgu_IntegratedManageSystem/obj/Debug/netcoreapp2.0/Trumgu_IntegratedManageSystem.pdb
