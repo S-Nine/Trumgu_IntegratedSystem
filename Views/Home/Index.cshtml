@@ -14,9 +14,29 @@
 	<meta charset="UTF-8">
 	<title>川谷综合管理系统</title>
 	<link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/default/easyui.css">
-	<link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/icons/icon.css">
+	<link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/icon.css">
 	<script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.min.js"></script>
 	<script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.easyui.min.js"></script>
+	<style>
+		.menu_2{
+			margin: 5px;
+			height: 24px;
+			line-height:24px;
+			font-size: 12px;
+			padding-left: 16px;
+			cursor: pointer;
+			/*background: #E0ECFF;*/
+		}
+
+		.select_menu{
+			background: #E0ECFF;
+		}
+
+		.no_menu{
+			text-align: center;
+    		margin-top: 10px;
+		}
+	</style>
 </head>
 <body>
 	<div class="easyui-layout" style="width:100%;height:100%;">
@@ -25,10 +45,15 @@
 			<p style="">©2018 深圳前海川谷信息技术有限公司</p>
 		</div>
 		<!-- <div data-options="region:'east',split:true" title="East" style="width:100px;"></div> -->
-		<div data-options="region:'west',split:true" title="菜单" style="width:200px;"></div>
+		<div data-options="region:'west',split:true" title="菜单" style="width:200px;">
+			<div id="navigation" class="easyui-accordion" data-options="fit:true,border:false">
+				
+			</div>
+		</div>
 		<div data-options="region:'center',title:'',iconCls:'icon-ok'">
 			
 		</div>
 	</div>
+	<script type="text/javascript" src="~/js/home/index.js?t=@DateTime.Now.ToFileTimeUtc()"></script>
 </body>
 </html>

@@ -67,6 +67,12 @@
 .icon-more{
 	background:url('icons/more.png') no-repeat center center;
 }
+.icon-menu-1{
+	background:url('icons/menu1.png') no-repeat center center;
+}
+.icon-menu-2{
+	background:url('icons/menu2.png') no-repeat center center;
+}
 
 
 .icon-mini-add{

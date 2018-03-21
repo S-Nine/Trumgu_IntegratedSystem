@@ -1,0 +1,10 @@
+F:\CaiYong\WorkSpace\Core\Git\Trumgu_IntegratedSystem\bin\Debug\netcoreapp2.0\Trumgu_IntegratedManageSystem.deps.json
+F:\CaiYong\WorkSpace\Core\Git\Trumgu_IntegratedSystem\bin\Debug\netcoreapp2.0\Trumgu_IntegratedManageSystem.runtimeconfig.json
+F:\CaiYong\WorkSpace\Core\Git\Trumgu_IntegratedSystem\bin\Debug\netcoreapp2.0\Trumgu_IntegratedManageSystem.runtimeconfig.dev.json
+F:\CaiYong\WorkSpace\Core\Git\Trumgu_IntegratedSystem\bin\Debug\netcoreapp2.0\Trumgu_IntegratedManageSystem.dll
+F:\CaiYong\WorkSpace\Core\Git\Trumgu_IntegratedSystem\bin\Debug\netcoreapp2.0\Trumgu_IntegratedManageSystem.pdb
+F:\CaiYong\WorkSpace\Core\Git\Trumgu_IntegratedSystem\obj\Debug\netcoreapp2.0\Trumgu_IntegratedManageSystem.csproj.CoreCompileInputs.cache
+F:\CaiYong\WorkSpace\Core\Git\Trumgu_IntegratedSystem\obj\Debug\netcoreapp2.0\Trumgu_IntegratedManageSystem.AssemblyInfoInputs.cache
+F:\CaiYong\WorkSpace\Core\Git\Trumgu_IntegratedSystem\obj\Debug\netcoreapp2.0\Trumgu_IntegratedManageSystem.AssemblyInfo.cs
+F:\CaiYong\WorkSpace\Core\Git\Trumgu_IntegratedSystem\obj\Debug\netcoreapp2.0\Trumgu_IntegratedManageSystem.dll
+F:\CaiYong\WorkSpace\Core\Git\Trumgu_IntegratedSystem\obj\Debug\netcoreapp2.0\Trumgu_IntegratedManageSystem.pdb
