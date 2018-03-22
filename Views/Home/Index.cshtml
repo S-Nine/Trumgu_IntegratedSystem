@@ -2,13 +2,6 @@
     Layout = null;
 }
 <!DOCTYPE html>
-<style>
-	html,body{
-		height:100%;
-		padding:0px;
-		margin:0px;
-	}
-</style>
 <html>
 <head>
 	<meta charset="UTF-8">
@@ -17,7 +10,14 @@
 	<link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/icon.css">
 	<script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.min.js"></script>
 	<script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="~/js/utils/tools.js"></script>
 	<style>
+		html,body{
+			height:100%;
+			padding:0px;
+			margin:0px;
+		}
+
 		.menu_2{
 			margin: 5px;
 			height: 24px;
@@ -40,18 +40,25 @@
 </head>
 <body>
 	<div class="easyui-layout" style="width:100%;height:100%;">
-		<div data-options="region:'north'" style="height:80px"></div>
-		<div data-options="region:'south',split:false" style="height:45px;text-align:center;">
-			<p style="">©2018 深圳前海川谷信息技术有限公司</p>
+		<div data-options="region:'north'" style="height:80px">
+			
+		</div>
+		<div data-options="region:'south',split:false" style="height:25px;text-align:center;overflow:hidden;">
+			<p style="margin-top:3px;">©2018 深圳前海川谷信息技术有限公司</p>
 		</div>
 		<!-- <div data-options="region:'east',split:true" title="East" style="width:100px;"></div> -->
 		<div data-options="region:'west',split:true" title="菜单" style="width:200px;">
 			<div id="navigation" class="easyui-accordion" data-options="fit:true,border:false">
-				
 			</div>
 		</div>
 		<div data-options="region:'center',title:'',iconCls:'icon-ok'">
-			
+			<div id="tab_content" class="easyui-tabs" data-options="" style="width:100%;height:100%;">
+				<div title="首页" style="padding:0px" data-options="iconCls:'icon-menu-2'">
+					<div style="width:100%;height:100%;overflow:hidden;">
+						<iframe style="width:100%;height:100%;border:0px;" src="https://www.baidu.com/"></iframe>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 	<script type="text/javascript" src="~/js/home/index.js?t=@DateTime.Now.ToFileTimeUtc()"></script>

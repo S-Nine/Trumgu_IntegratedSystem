@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Trumgu_IntegratedManageSystem.Attributes;
 using Trumgu_IntegratedManageSystem.Models;
 using Trumgu_IntegratedManageSystem.Models.sys;
 
@@ -11,8 +13,10 @@ namespace Trumgu_IntegratedManageSystem.Controllers
 {
     public class HomeController : Controller
     {
+        [NoFilterAttribute]
         public IActionResult Index()
         {
+            HttpContext.Session.SetString(key: "name", value: "123456"); 
             return View();
         }
 

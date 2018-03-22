@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Trumgu_IntegratedManageSystem.Filters;
 
 namespace Trumgu_IntegratedManageSystem
 {
@@ -20,8 +21,11 @@ namespace Trumgu_IntegratedManageSystem
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvc();
+        {   
+            services.AddMvc(cfg=>{
+                cfg.Filters.Add(new ActionFilter());
+            });
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,7 +41,8 @@ namespace Trumgu_IntegratedManageSystem
             }
 
             app.UseStaticFiles();
-
+            // 启用Session
+            app.UseSession();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
