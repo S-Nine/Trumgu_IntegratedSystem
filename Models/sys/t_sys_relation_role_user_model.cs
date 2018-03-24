@@ -3,7 +3,7 @@ using System;
 namespace Trumgu_IntegratedManageSystem.Models.sys
 {
 
-    public class t_sys_menuObj
+    public class t_sys_relation_role_userObj
     {
         private int? _id = null;
         /// <summary>
@@ -11,47 +11,17 @@ namespace Trumgu_IntegratedManageSystem.Models.sys
         /// </summary>
         public int? id { get { return _id; } set { _id = value; } }
 
-        private string _name = null;
+        private int? _role_id = null;
         /// <summary>
-        /// 菜单名称
+        /// 角色主键
         /// </summary>
-        public string name { get { return _name; } set { _name = value; } }
+        public int? role_id { get { return _role_id; } set { _role_id = value; ; } }
 
-        private string _path = null;
+        private int? _user_id = null;
         /// <summary>
-        /// 菜单路径
+        /// 用户主键
         /// </summary>
-        public string path { get { return _path; } set { _path = value; } }
-
-        private string _icon = null;
-        /// <summary>
-        /// 菜单图标
-        /// </summary>
-        public string icon { get { return _icon; } set { _icon = value; } }
-
-        private int? _level = null;
-        /// <summary>
-        /// 菜单等级
-        /// </summary>
-        public int? level { get { return _level; } set { _level = value; } }
-
-        private int? _sort = null;
-        /// <summary>
-        /// 菜单排序
-        /// </summary>
-        public int? sort { get { return _sort; } set { _sort = value; } }
-
-        private int? _parent_id = null;
-        /// <summary>
-        /// 父级主键
-        /// </summary>
-        public int? parent_id { get { return _parent_id; } set { _parent_id = value; } }
-
-        private int? _state = null;
-        /// <summary>
-        /// 状态：0->禁止；1->可用
-        /// </summary>
-        public int? state { get { return _state; } set { _state = value; } }
+        public int? user_id { get { return _user_id; } set { _user_id = value; ; } }
 
         private int? _is_delete = null;
         /// <summary>

@@ -42,7 +42,7 @@ namespace Trumgu_IntegratedManageSystem.Filters
                     return;
                 }
                 #endregion
-                //var session = context.HttpContext.Session.GetString("name");
+                var session = context.HttpContext.Session.GetString("name");
                 //  if (session.GetString("name") == null)
                 //  {
                 //      throw new Exception("用户身份验证失败！");

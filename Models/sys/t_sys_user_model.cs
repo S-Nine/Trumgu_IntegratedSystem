@@ -2,8 +2,7 @@ using System;
 
 namespace Trumgu_IntegratedManageSystem.Models.sys
 {
-
-    public class t_sys_menuObj
+    public class t_sys_userObj
     {
         private int? _id = null;
         /// <summary>
@@ -13,43 +12,43 @@ namespace Trumgu_IntegratedManageSystem.Models.sys
 
         private string _name = null;
         /// <summary>
-        /// 菜单名称
+        /// 角色名称
         /// </summary>
         public string name { get { return _name; } set { _name = value; } }
 
-        private string _path = null;
+        private string _login_name = null;
         /// <summary>
-        /// 菜单路径
+        /// 登录名称
         /// </summary>
-        public string path { get { return _path; } set { _path = value; } }
+        public string login_name { get { return _login_name; } set { _login_name = value; } }
 
-        private string _icon = null;
+        private string _login_pwd = null;
         /// <summary>
-        /// 菜单图标
+        /// 登录密码
         /// </summary>
-        public string icon { get { return _icon; } set { _icon = value; } }
+        public string login_pwd { get { return _login_pwd; } set { _login_pwd = value; } }
 
-        private int? _level = null;
+        private string _email = null;
         /// <summary>
-        /// 菜单等级
+        /// 邮箱
         /// </summary>
-        public int? level { get { return _level; } set { _level = value; } }
+        public string email { get { return _email; } set { _email = value; } }
 
-        private int? _sort = null;
+        private string _tel = null;
         /// <summary>
-        /// 菜单排序
+        /// 联系电话
         /// </summary>
-        public int? sort { get { return _sort; } set { _sort = value; } }
+        public string tel { get { return _tel; } set { _tel = value; } }
 
-        private int? _parent_id = null;
+        private int? _gender = null;
         /// <summary>
-        /// 父级主键
+        /// 性别：0->女；1->男；
         /// </summary>
-        public int? parent_id { get { return _parent_id; } set { _parent_id = value; } }
+        public int? gender { get { return _gender; } set { _gender = value; } }
 
         private int? _state = null;
         /// <summary>
-        /// 状态：0->禁止；1->可用
+        /// 角色状态：0->禁用；1->启用
         /// </summary>
         public int? state { get { return _state; } set { _state = value; } }
 

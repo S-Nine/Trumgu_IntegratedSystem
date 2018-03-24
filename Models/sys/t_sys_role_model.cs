@@ -2,8 +2,7 @@ using System;
 
 namespace Trumgu_IntegratedManageSystem.Models.sys
 {
-
-    public class t_sys_menuObj
+    public class t_sys_roleObj
     {
         private int? _id = null;
         /// <summary>
@@ -11,47 +10,30 @@ namespace Trumgu_IntegratedManageSystem.Models.sys
         /// </summary>
         public int? id { get { return _id; } set { _id = value; } }
 
+
         private string _name = null;
         /// <summary>
-        /// 菜单名称
+        /// 角色名称
         /// </summary>
         public string name { get { return _name; } set { _name = value; } }
 
-        private string _path = null;
+        private int? _data_permiss = null;
         /// <summary>
-        /// 菜单路径
+        /// 角色权限：0->全部数据；100->本部门及下属部门数据；200->自建数据
         /// </summary>
-        public string path { get { return _path; } set { _path = value; } }
-
-        private string _icon = null;
-        /// <summary>
-        /// 菜单图标
-        /// </summary>
-        public string icon { get { return _icon; } set { _icon = value; } }
-
-        private int? _level = null;
-        /// <summary>
-        /// 菜单等级
-        /// </summary>
-        public int? level { get { return _level; } set { _level = value; } }
-
-        private int? _sort = null;
-        /// <summary>
-        /// 菜单排序
-        /// </summary>
-        public int? sort { get { return _sort; } set { _sort = value; } }
-
-        private int? _parent_id = null;
-        /// <summary>
-        /// 父级主键
-        /// </summary>
-        public int? parent_id { get { return _parent_id; } set { _parent_id = value; } }
+        public int? data_permiss { get { return _data_permiss; } set { _data_permiss = value; } }
 
         private int? _state = null;
         /// <summary>
-        /// 状态：0->禁止；1->可用
+        /// 角色状态：0->禁用；1->启用
         /// </summary>
         public int? state { get { return _state; } set { _state = value; } }
+
+        private string _remarks = null;
+        /// <summary>
+        /// 角色备注
+        /// </summary>
+        public string remarks { get { return _remarks; } set { _remarks = value; } }
 
         private int? _is_delete = null;
         /// <summary>

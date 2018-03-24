@@ -3,7 +3,7 @@ using System;
 namespace Trumgu_IntegratedManageSystem.Models.sys
 {
 
-    public class t_sys_menuObj
+    public class t_sys_delpartmentObj
     {
         private int? _id = null;
         /// <summary>
@@ -13,45 +13,21 @@ namespace Trumgu_IntegratedManageSystem.Models.sys
 
         private string _name = null;
         /// <summary>
-        /// 菜单名称
+        /// 部门名称
         /// </summary>
         public string name { get { return _name; } set { _name = value; } }
 
-        private string _path = null;
+        private string _remarks = null;
         /// <summary>
-        /// 菜单路径
+        /// 部门备注
         /// </summary>
-        public string path { get { return _path; } set { _path = value; } }
-
-        private string _icon = null;
-        /// <summary>
-        /// 菜单图标
-        /// </summary>
-        public string icon { get { return _icon; } set { _icon = value; } }
-
-        private int? _level = null;
-        /// <summary>
-        /// 菜单等级
-        /// </summary>
-        public int? level { get { return _level; } set { _level = value; } }
-
-        private int? _sort = null;
-        /// <summary>
-        /// 菜单排序
-        /// </summary>
-        public int? sort { get { return _sort; } set { _sort = value; } }
+        public string remarks { get { return _remarks; } set { _remarks = value; } }
 
         private int? _parent_id = null;
         /// <summary>
-        /// 父级主键
+        /// 父级部门主键，顶级部门为0
         /// </summary>
-        public int? parent_id { get { return _parent_id; } set { _parent_id = value; } }
-
-        private int? _state = null;
-        /// <summary>
-        /// 状态：0->禁止；1->可用
-        /// </summary>
-        public int? state { get { return _state; } set { _state = value; } }
+        public int? parent_id { get { return _parent_id; } set { _parent_id = value; ; } }
 
         private int? _is_delete = null;
         /// <summary>

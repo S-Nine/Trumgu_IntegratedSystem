@@ -13,10 +13,11 @@ namespace Trumgu_IntegratedManageSystem.Controllers
 {
     public class HomeController : Controller
     {
-        [NoFilterAttribute]
         public IActionResult Index()
         {
-            HttpContext.Session.SetString(key: "name", value: "123456"); 
+            //HttpContext.Session.SetString(key: "name", value: "123456"); 
+            var v =Newtonsoft.Json.JsonConvert.SerializeObject(new {id=1,name="123",dt=DateTime.Now});
+            var o = Newtonsoft.Json.JsonConvert.DeserializeObject(v);
             return View();
         }
 
