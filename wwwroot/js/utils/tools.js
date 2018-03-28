@@ -2,9 +2,30 @@
  * 获取URL参数
  * @param {参数key} name 
  */
-function GetQueryString(name)
-{
-     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
-     var r = window.location.search.substr(1).match(reg);
-     if(r!=null)return  unescape(r[2]); return null;
+function getQueryString(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]);
+    return null;
+}
+
+/**
+ * 验证指定元素下所有easyui-validatebox是否满足条件
+ */
+function isValidate(id) {
+    try {
+        var v = $('#' + id + ' .easyui-validatebox');
+        if (v != null && v.length > 0) {
+            for (var i = 0; i < v.length; i++) {
+                if (!$(v[i]).validatebox('isValid')) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return true;
+        }
+    } catch (e) {
+        return false;
+    }
 }

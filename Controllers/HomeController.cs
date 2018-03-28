@@ -13,31 +13,40 @@ namespace Trumgu_IntegratedManageSystem.Controllers
 {
     public class HomeController : Controller
     {
+        /// <summary>
+        /// 框架页面
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
-            //HttpContext.Session.SetString(key: "name", value: "123456"); 
-            var v =Newtonsoft.Json.JsonConvert.SerializeObject(new {id=1,name="123",dt=DateTime.Now});
-            var o = Newtonsoft.Json.JsonConvert.DeserializeObject(v);
             return View();
         }
 
+        /// <summary>
+        /// 欢迎页面
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult Welcome()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 获取用户权限菜单
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         public JsonResult GetMenu()
         {
-            List<object> menu_ary = new List<object>();
-            Utils.DataContextHelper db = Utils.DBHelper.CreateContext();
-            List<t_sys_menuObj> list = (from e in db.t_sys_menu
-                                        where e.state == 1 && e.is_delete == 0
-                                        select new t_sys_menuObj
-                                        {
-                                            id = e.id,
-                                            name = e.name,
-                                            path = e.path,
-                                            icon = e.icon,
-                                            level = e.level,
-                                            sort = e.sort,
-                                            parent_id = e.parent_id
-                                        }).ToList();
+            List<object> menu_ary = new List<Object>();
+            List<t_sys_menuObj> list = null;
+
+            string cMenuInfo = HttpContext.Session.GetString("MenuInfo");
+            if (!string.IsNullOrWhiteSpace(cMenuInfo))
+            {
+                list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<t_sys_menuObj>>(cMenuInfo);
+            }
+
             if (list != null && list.Count > 0)
             {
                 var temp = list.Where(rec => rec.level == 1).OrderBy(o => o.sort).ToList();
@@ -57,6 +66,33 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             }
 
             return Json(menu_ary);
+        }
+
+        /// <summary>
+        /// 根据菜单id获取权限按钮
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetMenuButton(int menu_id)
+        {
+            List<t_sys_buttonObj> button_ary = null;
+            List<t_sys_buttonObj> list = null;
+
+            string cButtonInfo = HttpContext.Session.GetString("ButtonInfo");
+            if (!string.IsNullOrWhiteSpace(cButtonInfo))
+            {
+                list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<t_sys_buttonObj>>(cButtonInfo);
+            }
+            if (list != null && list.Count > 0)
+            {
+                button_ary = list.Where(rec => rec.menu_id == menu_id).ToList();
+            }
+            else
+            {
+                button_ary = new List<t_sys_buttonObj>();
+            }
+
+            return Json(button_ary.OrderBy(rec => rec.btn_sort));
         }
     }
 }

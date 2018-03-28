@@ -7,7 +7,7 @@ $(document).ready(function () {
  */
 function initMenu() {
     $.ajax({
-        url: '/home/GetMenu/',
+        url: '/Home/GetMenu/',
         type: 'post',
         dataType: 'json',
         success: function (data) {

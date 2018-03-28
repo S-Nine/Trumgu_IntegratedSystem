@@ -1,5 +1,36 @@
+
+<script type="text/javascript" src="~/js/utils/tools.js"></script>
+<div id="buttonBar" class="easyui-panel" style="padding:5px;height:40px;width:100%;">
+    <div id="div_no_right" style="text-align: center;"><span>您没有权限！</span></div>
+</div>
 <script>
     $(document).ready(function(){
-        alert(GetQueryString('menu_id'));
+        var menu_id = getQueryString('menu_id');
+
+        if(menu_id==null || $.trim(menu_id)==''){
+            $('#div_no_right').show();
+        }else{
+            $.ajax({
+                url: '/Home/GetMenuButton/',
+                type: 'post',
+                dataType: 'json',
+                data:{ menu_id : menu_id },
+                success: function (data) {
+                    var h = '';
+                    if(data!=null && data.length>0){
+                        $('#div_no_right').hide();
+                        for(var i = 0; i < data.length; i++){
+                            h += '<a id="'+data[i].btn_code+'" href="#" class="easyui-linkbutton" data-options="iconCls:\''+data[i].btn_img+'\'">'+data[i].btn_name+'</a>&nbsp;&nbsp;&nbsp;';
+                        }
+                        $('#buttonBar').append(h);
+                        $.parser.parse('#buttonBar');
+                        
+                        if(initButtonEvent!=null && typeof(initButtonEvent)=='function'){
+                            initButtonEvent();
+                        }
+                    }
+                }
+            });
+        }       
     });
 </script>

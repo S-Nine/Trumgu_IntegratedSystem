@@ -15,7 +15,7 @@ namespace Trumgu_IntegratedManageSystem.Filters
         /// <summary>
         /// 免验证Action列表（格式：ControllerName/ActionName）
         /// </summary>
-        private List<string> No_Verification_Action = new List<string>() { "/Home/Index" };
+        private List<string> No_Verification_Action = new List<string>() { "/Login/Index" };
 
         void IActionFilter.OnActionExecuted(ActionExecutedContext context)
         {
@@ -42,15 +42,15 @@ namespace Trumgu_IntegratedManageSystem.Filters
                     return;
                 }
                 #endregion
-                var session = context.HttpContext.Session.GetString("name");
-                //  if (session.GetString("name") == null)
-                //  {
-                //      throw new Exception("用户身份验证失败！");
-                //  }
+                string cUserInfo = context.HttpContext.Session.GetString("UserInfo");
+                if (string.IsNullOrWhiteSpace(cUserInfo))
+                {
+                    throw new Exception("用户身份验证失败！");
+                }
             }
             catch (Exception)
             {
-                context.HttpContext.Response.Redirect("/MVC/Error/Error401");
+                context.HttpContext.Response.Redirect("/Login/Index?t=" + DateTime.Now.ToFileTimeUtc(), true);
             }
         }
     }

@@ -1,0 +1,23 @@
+html,
+body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.content {
+    height: 100%;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.operation_area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.datagrid_area {
+    height: 100%;
+}

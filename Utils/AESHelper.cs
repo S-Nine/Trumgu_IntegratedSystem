@@ -15,7 +15,7 @@ namespace Trumgu_IntegratedManageSystem.Utils
         /// <summary>
         /// 加密
         /// </summary>
-        /// <param name="input">密文</param>
+        /// <param name="input">明文</param>
         public static string EncryptText(string input)
         {
 
@@ -34,7 +34,7 @@ namespace Trumgu_IntegratedManageSystem.Utils
         /// <summary>
         /// 解密
         /// </summary>
-        /// <param name="input">明文</param>
+        /// <param name="input">密文</param>
         public static string DecryptText(string input)
         {
             byte[] bytesToBeDecrypted = Convert.FromBase64String(input);
