@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).ready(function() {
     initMenu();
 });
 
@@ -10,7 +10,7 @@ function initMenu() {
         url: '/Home/GetMenu/',
         type: 'post',
         dataType: 'json',
-        success: function (data) {
+        success: function(data) {
             if (data != null && data.length > 0) {
                 for (var i = 0; i < data.length; i++) {
                     var h = '';
@@ -49,7 +49,7 @@ function onClickMenu2() {
     var tab = $('#tab_content').tabs('getTab', name);
     if (tab != null) {
         $('#tab_content').tabs('select', name);
-    } else {
+    } else if (path != null && $.trim(path) != '') {
         $('#tab_content').tabs('add', {
             title: name,
             content: '<div style="width:100%;height:100%;overflow:hidden;"><iframe style="width:100%;height:100%;border:0px;" src="' + path + '?menu_id=' + id + '"></iframe></div>',

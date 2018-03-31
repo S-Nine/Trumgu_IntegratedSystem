@@ -30,8 +30,9 @@
 			<table id="button_datagrid" title="按钮列表"></table> 
 		</div>
 	</div>
-	<div id="dlg_add_menu" class="easyui-dialog" title="新增菜单" style="width:310px;height:280px;padding:5px;"   
+	<div id="dlg_add_menu" class="easyui-dialog" title="编辑菜单" style="width:310px;height:280px;padding:5px;"   
         data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<input type="hidden" id="hid_menu_id" value=""/>
 		<div style="margin-top:10px;">
 			<span>上级菜单：</span>
 			<select id="cmb_parent_id" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false,url:'/System/GetRootMenuToList/',valueField:'id',textField:'text'">
@@ -43,7 +44,7 @@
 		</div>
 		<div style="margin-top:5px;">
 			<span>菜单图标：</span>
-			<input id="txt_icon" class="easyui-textbox" data-options="" style="width:200px">
+			<input id="txt_icon" class="easyui-textbox" data-options="validType:['length[0,100]']" style="width:200px">
 		</div>
 		<div style="margin-top:5px;">
 			<span>菜单排序：</span>
@@ -58,7 +59,32 @@
 		</div>
 		<div style="margin-top:5px;">
 			<span>菜单路径：</span>
-			<input id="txt_path" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+			<input id="txt_path" class="easyui-textbox" data-options="validType:['length[0,100]']" style="width:200px">
+		</div>
+	</div>
+	<div id="dlg_add_button" class="easyui-dialog" title="编辑按钮" style="width:310px;height:235px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<input type="hidden" id="hid_button_id" value=""/>
+		<input type="hidden" id="hid_btn_menu_id" value=""/>
+		<div style="margin-top:10px;">
+			<span>&nbsp;&nbsp;所属菜单：</span>
+			<input id="txt_btn_menu_name" class="easyui-textbox easyui-validatebox" data-options="disabled:true" style="width:200px">
+		</div>
+		<div style="margin-top:5px;">
+			<span>按钮Code：</span>
+			<input id="txt_btn_code" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>&nbsp;&nbsp;按钮名称：</span>
+			<input id="txt_btn_name" class="easyui-textbox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>&nbsp;&nbsp;按钮图标：</span>
+			<input id="txt_btn_img" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:200px">
+		</div>
+		<div style="margin-top:5px;">
+			<span>&nbsp;&nbsp;按钮排序：</span>
+			<input id="txt_btn_sort" class="easyui-textbox easyui-validatebox" data-options="validType:['integer']" style="width:200px">
 		</div>
 	</div>
 	<script type="text/javascript" src="~/js/system/menu.js?t=@DateTime.Now.ToFileTimeUtc()"></script>

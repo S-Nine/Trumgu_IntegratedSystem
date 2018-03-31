@@ -20,7 +20,7 @@
                     if(data!=null && data.length>0){
                         $('#div_no_right').hide();
                         for(var i = 0; i < data.length; i++){
-                            h += '<a id="'+data[i].btn_code+'" href="#" class="easyui-linkbutton" data-options="iconCls:\''+data[i].btn_img+'\'">'+data[i].btn_name+'</a>&nbsp;&nbsp;&nbsp;';
+                            h += '<a id="'+data[i].btn_code+'" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:\''+data[i].btn_img+'\'">'+data[i].btn_name+'</a>&nbsp;&nbsp;&nbsp;';
                         }
                         $('#buttonBar').append(h);
                         $.parser.parse('#buttonBar');

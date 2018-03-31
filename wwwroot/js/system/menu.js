@@ -142,16 +142,18 @@ function initMenuButton() {
 function initEvent() {
     $('#dlg_add_menu').dialog({
         toolbar: [{
-            id: 'addId',
+            id: 'menu_save',
             text: '保存',
             iconCls: 'icon-add',
             handler: function() {
-                if ($('#addId').linkbutton("options").disabled) { // 防止重复提交数据
-                    return;
-                }
-                $('#addId').linkbutton("disable"); // 禁用
                 if (isValidate('dlg_add_menu')) {
+                    if ($('#menu_save').linkbutton("options").disabled) { // 防止重复提交数据
+                        return;
+                    }
+                    $('#menu_save').linkbutton("disable"); // 禁用
+
                     var params = {
+                        id: $('#hid_menu_id').val(),
                         name: $('#txt_name').textbox('getValue'),
                         path: $('#txt_path').textbox('getValue'),
                         icon: $('#txt_icon').textbox('getValue'),
@@ -161,13 +163,13 @@ function initEvent() {
                         state: $('#cmb_state').combo('getValue')
                     };
                     $.ajax({
-                        url: '/System/AddMenu/',
+                        url: params.id == null || params.id == '' ? '/System/AddMenu/' : '/System/UpdateMenu/',
                         type: 'post',
                         dataType: 'json',
                         data: params,
                         success: function(data) {
-                            if ($('#addId').linkbutton("options").disabled) { // 防止重复提交数据
-                                $('#addId').linkbutton("enable"); // 启用
+                            if ($('#menu_save').linkbutton("options").disabled) { // 防止重复提交数据
+                                $('#menu_save').linkbutton("enable"); // 启用
                             }
                             if (data != null && data.code == 200) {
                                 $('#dlg_add_menu').dialog('close');
@@ -175,14 +177,64 @@ function initEvent() {
                                 $('#button_datagrid').datagrid('loadData', { total: 0, rows: [] });
                                 $('#menu_treegrid').treegrid('unselectAll');
                                 $('#menu_treegrid').treegrid('reload');
+                                $('#cmb_parent_id').combobox('reload');
                             } else {
                                 $.messager.alert('提示', '保存失败！');
                             }
                         },
                         error: function() {
                             $.messager.alert('错误', '网络连接失败、请稍后再试！');
-                            if ($('#addId').linkbutton("options").disabled) { // 防止重复提交数据
-                                $('#addId').linkbutton("enable"); // 启用
+                            if ($('#menu_save').linkbutton("options").disabled) { // 防止重复提交数据
+                                $('#menu_save').linkbutton("enable"); // 启用
+                            }
+                        }
+                    });
+                }
+            }
+        }]
+    });
+
+    $('#dlg_add_button').dialog({
+        toolbar: [{
+            id: 'button_save',
+            text: '保存',
+            iconCls: 'icon-add',
+            handler: function() {
+                if (isValidate('dlg_add_button')) {
+                    if ($('#button_save').linkbutton("options").disabled) { // 防止重复提交数据
+                        return;
+                    }
+                    $('#button_save').linkbutton("disable"); // 禁用
+
+                    var params = {
+                        id: $('#hid_button_id').val(),
+                        menu_id: $('#hid_btn_menu_id').val(),
+                        btn_code: $('#txt_btn_code').textbox('getValue'),
+                        btn_name: $('#txt_btn_name').textbox('getValue'),
+                        btn_img: $('#txt_btn_img').textbox('getValue'),
+                        btn_sort: $('#txt_btn_sort').textbox('getValue')
+                    };
+                    $.ajax({
+                        url: params.id == null || params.id == '' ? '/System/AddButton/' : '/System/UpdateButton/',
+                        type: 'post',
+                        dataType: 'json',
+                        data: params,
+                        success: function(data) {
+                            if ($('#button_save').linkbutton("options").disabled) { // 防止重复提交数据
+                                $('#button_save').linkbutton("enable"); // 启用
+                            }
+                            if (data != null && data.code == 200) {
+                                $('#dlg_add_button').dialog('close');
+                                $.messager.alert('提示', '保存成功！');
+                                $('#button_datagrid').datagrid({ url: '/System/GetMenuButton/', queryParams: { menu_id: params.menu_id } });
+                            } else {
+                                $.messager.alert('提示', '保存失败！');
+                            }
+                        },
+                        error: function() {
+                            $.messager.alert('错误', '网络连接失败、请稍后再试！');
+                            if ($('#button_save').linkbutton("options").disabled) { // 防止重复提交数据
+                                $('#button_save').linkbutton("enable"); // 启用
                             }
                         }
                     });
@@ -203,9 +255,182 @@ function initButtonEvent() {
     });
 
     $('#btn_add_menu') != null && $('#btn_add_menu').click(function() {
+        cleanAddMenuDialog();
         $('#dlg_add_menu').dialog('open');
-        if ($('#addId').linkbutton("options").disabled) {
-            $('#addId').linkbutton("enable");
+
+        var rows = $('#menu_treegrid').treegrid('getSelections');
+        if (rows != null && rows.length == 1) {
+            var data = $('#cmb_parent_id').combobox('getData');
+            if (data != null && data.length > 0) {
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].id == rows[0].id) {
+                        $('#cmb_parent_id').combobox('setValue', rows[0].id);
+                        return;
+                    }
+                }
+            }
+            $('#cmb_parent_id').combobox('setValue', 0);
         }
     });
+
+    $('#btn_edit_menu') != null && $('#btn_edit_menu').click(function() {
+        var rows = $('#menu_treegrid').treegrid('getSelections');
+        if (rows != null && rows.length == 1) {
+            cleanAddMenuDialog();
+
+            $('#hid_menu_id').val(rows[0].id);
+            $('#txt_name').textbox('setValue', rows[0].name != null ? rows[0].name : '');
+            $('#txt_icon').textbox('setValue', rows[0].icon != null ? rows[0].icon : '');
+            $('#txt_sort').textbox('setValue', rows[0].sort != null ? rows[0].sort : '');
+            $('#cmb_state').combobox('setValue', rows[0].btn_state != null ? rows[0].btn_state : 1);
+            $('#txt_path').textbox('setValue', rows[0].path != null ? rows[0].path : '');
+
+            var data = $('#cmb_parent_id').combobox('getData');
+            if (data != null && data.length > 0 && rows[0].parent_id != null) {
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].id == rows[0].parent_id) {
+                        $('#cmb_parent_id').combobox('setValue', rows[0].parent_id);
+                        break;
+                    }
+                    if (i == data.length - 1) {
+                        $('#cmb_parent_id').combobox('setValue', 0);
+                    }
+                }
+            } else {
+                $('#cmb_parent_id').combobox('setValue', 0);
+            }
+
+            $('#dlg_add_menu').dialog('open');
+        } else {
+            $.messager.alert('提示', '请选择一条菜单数据！');
+        }
+    });
+
+    $('#btn_del_menu') != null && $('#btn_del_menu').click(function() {
+        var rows = $('#menu_treegrid').treegrid('getSelections');
+        if (rows != null && rows.length == 1) {
+            $.messager.confirm('确认', '您确认想要删除菜单数据吗？', function(r) {
+                if (r) {
+                    $.ajax({
+                        url: '/System/DeleteMenu/',
+                        type: 'post',
+                        dataType: 'json',
+                        data: { id: rows[0].id },
+                        success: function(data) {
+                            if (data != null && data.code == 200) {
+                                $.messager.alert('提示', '删除成功！');
+                                $('#button_datagrid').datagrid('loadData', { total: 0, rows: [] });
+                                $('#menu_treegrid').treegrid('unselectAll');
+                                $('#menu_treegrid').treegrid('reload');
+                                $('#cmb_parent_id').combobox('reload');
+                            } else {
+                                $.messager.alert('提示', '删除失败！');
+                            }
+                        },
+                        error: function() {
+                            $.messager.alert('错误', '网络连接失败、请稍后再试！');
+                        }
+                    });
+                }
+            });
+        } else {
+            $.messager.alert('提示', '请选择一条菜单数据！');
+        }
+    });
+
+    $('#btn_add_button') != null && $('#btn_add_button').click(function() {
+        var rows = $('#menu_treegrid').treegrid('getSelections');
+        if (rows != null && rows.length == 1) {
+            cleanAddButtonDialog();
+            $('#hid_btn_menu_id').val(rows[0].id);
+            $('#txt_btn_menu_name').textbox('setValue', rows[0].name);
+            $('#dlg_add_button').dialog('open');
+        } else {
+            $.messager.alert('提示', '请选择一条菜单数据！');
+        }
+    });
+
+    $('#btn_edit_button') != null && $('#btn_edit_button').click(function() {
+        var rows_menu = $('#menu_treegrid').treegrid('getSelections');
+        var rows_button = $('#button_datagrid').treegrid('getSelections');
+        if (rows_button != null && rows_button.length == 1) {
+            cleanAddButtonDialog();
+
+            $('#hid_button_id').val(rows_button[0].id);
+            $('#hid_btn_menu_id').val(rows_menu[0].id);
+
+            $('#txt_btn_menu_name').textbox('setValue', rows_menu[0].name != null ? rows_menu[0].name : '');
+            $('#txt_btn_code').textbox('setValue', rows_button[0].btn_code != null ? rows_button[0].btn_code : '');
+            $('#txt_btn_name').textbox('setValue', rows_button[0].btn_name != null ? rows_button[0].btn_name : '');
+            $('#txt_btn_img').textbox('setValue', rows_button[0].btn_img != null ? rows_button[0].btn_img : '');
+            $('#txt_btn_sort').textbox('setValue', rows_button[0].btn_sort != null ? rows_button[0].btn_sort : '');
+
+            $('#dlg_add_button').dialog('open');
+        } else {
+            $.messager.alert('提示', '请选择一条按钮数据！');
+        }
+    });
+
+    $('#btn_del_button') != null && $('#btn_del_button').click(function() {
+        var rows_menu = $('#menu_treegrid').treegrid('getSelections');
+        var rows = $('#button_datagrid').datagrid('getSelections');
+        if (rows != null && rows.length == 1) {
+            $.messager.confirm('确认', '您确认想要删除按钮数据吗？', function(r) {
+                if (r) {
+                    $.ajax({
+                        url: '/System/DeleteButton/',
+                        type: 'post',
+                        dataType: 'json',
+                        data: { id: rows[0].id },
+                        success: function(data) {
+                            if (data != null && data.code == 200) {
+                                $.messager.alert('提示', '删除成功！');
+                                $('#button_datagrid').datagrid({ url: '/System/GetMenuButton/', queryParams: { menu_id: rows_menu[0].id } });
+                            } else {
+                                $.messager.alert('提示', '删除失败！');
+                            }
+                        },
+                        error: function() {
+                            $.messager.alert('错误', '网络连接失败、请稍后再试！');
+                        }
+                    });
+                }
+            });
+        } else {
+            $.messager.alert('提示', '请选择一条按钮数据！');
+        }
+    });
+}
+
+/**
+ * 清空添加菜单Dialog
+ */
+function cleanAddMenuDialog() {
+    if ($('#menu_save').linkbutton("options").disabled) {
+        $('#menu_save').linkbutton("enable");
+    }
+    $('#hid_menu_id').val('');
+    $('#cmb_parent_id').combobox('setValue', 0);
+    $('#txt_name').textbox('clear');
+    $('#txt_icon').textbox('clear');
+    $('#txt_sort').textbox('clear');
+    $('#cmb_state').combobox('setValue', 1);
+    $('#txt_path').textbox('clear');
+}
+
+/**
+ * 清空添加按钮Dialog
+ */
+function cleanAddButtonDialog() {
+    if ($('#button_save').linkbutton("options").disabled) {
+        $('#button_save').linkbutton("enable");
+    }
+
+    $('#hid_button_id').val('');
+    $('#hid_btn_menu_id').val('');
+    $('#txt_btn_menu_name').val('');
+    $('#txt_btn_code').textbox('clear');
+    $('#txt_btn_name').textbox('clear');
+    $('#txt_btn_img').textbox('clear');
+    $('#txt_btn_sort').textbox('clear');
 }
