@@ -437,5 +437,47 @@ namespace Trumgu_IntegratedManageSystem.Controllers
 
             return Json(ro);
         }
+
+        /// <summary>
+        /// 角色页面初始化
+        /// <summary>
+        /// <returns></returns>
+        public IActionResult Role()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 不分页获取全部角色信息列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetRoleToList()
+        {
+            List<object> role_ary = new List<object>();
+            Utils.DataContextHelper db = Utils.DBHelper.CreateContext();
+            List<t_sys_roleObj> list = db.t_sys_role.Where(rec => rec.is_delete == 0).ToList();
+            if (list != null && list.Count > 0)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    role_ary.Add(new
+                    {
+                        id = list[i].id,
+                        name = list[i].name,
+                        data_permiss = list[i].data_permiss,
+                        role_state = list[i].state,
+                        remarks = list[i].remarks,
+                        is_delete = list[i].is_delete,
+                        last_modify_id = list[i].last_modify_id,
+                        last_modify_name = list[i].last_modify_name,
+                        last_modify_time = list[i].last_modify_time,
+                        create_time = list[i].create_time
+                    });
+                }
+            }
+
+            return Json(role_ary);
+        }
     }
 }
