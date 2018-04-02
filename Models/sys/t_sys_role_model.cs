@@ -1,15 +1,12 @@
 using System;
 
-namespace Trumgu_IntegratedManageSystem.Models.sys
-{
-    public class t_sys_roleObj
-    {
+namespace Trumgu_IntegratedManageSystem.Models.sys {
+    public class t_sys_roleObj {
         private int? _id = null;
         /// <summary>
         /// 主键
         /// </summary>
         public int? id { get { return _id; } set { _id = value; } }
-
 
         private string _name = null;
         /// <summary>
@@ -64,5 +61,12 @@ namespace Trumgu_IntegratedManageSystem.Models.sys
         /// 创建日期
         /// </summary>
         public DateTime? create_time { get { return _create_time; } set { _create_time = value; } }
+    }
+
+    public class t_sys_roleSelObj {
+        /// <summary>
+        /// 角色名称
+        /// </summary>
+        public string name_like { get; set; }
     }
 }

@@ -352,7 +352,7 @@ function initButtonEvent() {
 
     $('#btn_edit_button') != null && $('#btn_edit_button').click(function() {
         var rows_menu = $('#menu_treegrid').treegrid('getSelections');
-        var rows_button = $('#button_datagrid').treegrid('getSelections');
+        var rows_button = $('#button_datagrid').datagrid('getSelections');
         if (rows_button != null && rows_button.length == 1) {
             cleanAddButtonDialog();
 

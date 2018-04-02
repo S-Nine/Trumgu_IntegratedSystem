@@ -20,12 +20,45 @@
 	<div class="content" style="padding: 78px 0 0;">
 		<div class="operation_area" style="height:780px;">
 			<div class="easyui-panel" style="padding:5px;height:38px;width:100%;">
+				角色名称：<input id="txt_name_like" class="easyui-textbox" style="width:150px">
 			</div>
 			@Html.Partial("../Shared/_ButtonTools.cshtml")
 		</div>
 		<div class="datagrid_area" style="width:100%;">
 			<table id="role_datagrid" title="角色列表"></table> 
 		</div>
+	</div>
+	<div id="dlg_add_role" class="easyui-dialog" title="编辑角色" style="width:310px;height:280px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<input type="hidden" id="hid_id" value=""/>
+		<div style="margin-top:5px;">
+			<span>角色名称：</span>
+			<input id="txt_name" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>角色权限：</span>
+			<select id="cmb_data_permiss" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false">   
+				<option value="0">全部</option>   
+				<option value="100">本部门及下属部门数据</option>
+				<option value="200">自建数据</option>
+			</select>&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>角色状态：</span>
+			<select id="cmb_state" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false">   
+				<option value="1">启用</option>   
+				<option value="0">禁用</option>
+			</select>&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>角色备注：</span>
+			<input id="txt_remarks" class="easyui-textbox" data-options="validType:['length[0,200]']" style="width:200px;height:80px;">
+		</div>
+	</div>
+	<div id="dlg_add_right" class="easyui-dialog" title="编辑权限" style="width:310px;height:280px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<input type="hidden" id="hid_right_id" value=""/>
+		<ul id="tree_right"></ul>  
 	</div>
 	<script type="text/javascript" src="~/js/system/role.js?t=@DateTime.Now.ToFileTimeUtc()"></script>
 </body>
