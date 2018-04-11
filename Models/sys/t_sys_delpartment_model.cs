@@ -59,4 +59,12 @@ namespace Trumgu_IntegratedManageSystem.Models.sys
         /// </summary>
         public DateTime? create_time { get { return _create_time; } set { _create_time = value; } }
     }
+
+    public class t_sys_delpartmentSelObj
+    {
+        /// <summary>
+        /// 模糊查询公司名称
+        /// </summary>
+        public string name_like{get;set;}        
+    }
 }

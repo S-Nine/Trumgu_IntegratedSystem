@@ -1,6 +1,7 @@
 using System;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Trumgu_IntegratedManageSystem.Models;
 using Trumgu_IntegratedManageSystem.Models.sys;
 
 namespace Trumgu_IntegratedManageSystem.Utils
@@ -53,5 +54,10 @@ namespace Trumgu_IntegratedManageSystem.Utils
         /// 系统按钮表
         /// </summary>
         public DbSet<t_sys_buttonObj> t_sys_button { get; set; }
+
+        /// <summary>
+        /// 菜单树
+        /// </summary>
+        public DbSet<MenuTreeDataObj> MenuTreeData { get; set; }
     }
 }
