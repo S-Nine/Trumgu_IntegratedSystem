@@ -72,7 +72,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                     });
                 }
             }
-
+            db.Dispose();
             return Json(menu_ary);
         }
 
@@ -101,6 +101,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                     });
                 }
             }
+            db.Dispose();
             return Json(menu_ary);
         }
 
@@ -120,6 +121,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             {
                 btn_ary = new List<t_sys_buttonObj>();
             }
+            db.Dispose();
             return Json(btn_ary);
         }
 
@@ -156,6 +158,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
             }
+            db.Dispose();
             return Json(ro);
         }
 
@@ -206,6 +209,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
             }
+            db.Dispose();
             return Json(ro);
         }
 
@@ -282,6 +286,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                         ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
                         ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
                     }
+                    db.Dispose();
                 }
                 else
                 {
@@ -331,6 +336,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
             }
+            db.Dispose();
             return Json(ro);
         }
 
@@ -378,6 +384,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
             }
+            db.Dispose();
             return Json(ro);
         }
 
@@ -431,7 +438,6 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
             }
-
             return Json(ro);
         }
 
@@ -477,7 +483,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                     });
                 }
             }
-
+            db.Dispose();
             return Json(role_ary);
         }
 
@@ -514,6 +520,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
             }
+            db.Dispose();
             return Json(ro);
         }
 
@@ -561,6 +568,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
             }
+            db.Dispose();
             return Json(ro);
         }
 
@@ -634,7 +642,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
             }
-
+            db.Dispose();
             return Json(ro);
         }
 
@@ -701,7 +709,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                     }
                 }
             }
-
+            db.Dispose();
             return Json(tree_data);
         }
 
@@ -760,7 +768,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
             }
-
+            db.Dispose();
             return Json(ro);
         }
 
@@ -804,7 +812,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                     }
                 }
             }
-
+            db.Dispose();
             return Json(department_ary);
         }
 
@@ -858,7 +866,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                     }
                 }
             }
-
+            db.Dispose();
             return Json(new List<object>(){new
             {
                 id = 0,
@@ -926,7 +934,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
             }
-
+            db.Dispose();
             return Json(ro);
         }
 
@@ -981,6 +989,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
             }
+            db.Dispose();
             return Json(ro);
         }
 
@@ -1049,7 +1058,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
                 ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
             }
-
+            db.Dispose();
             return Json(ro);
         }
     }

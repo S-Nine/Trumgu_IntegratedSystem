@@ -11,11 +11,11 @@ namespace Trumgu_IntegratedManageSystem.Filters
         /// <summary>
         /// 免验证Controller列表
         /// </summary>
-        private List<string> No_Verification_Controller = new List<string>() { "Error" };
+        private List<string> No_Verification_Controller = new List<string>() { "Error", "Login" };
         /// <summary>
         /// 免验证Action列表（格式：ControllerName/ActionName）
         /// </summary>
-        private List<string> No_Verification_Action = new List<string>() { "/Login/Index" };
+        private List<string> No_Verification_Action = new List<string>() { };
 
         void IActionFilter.OnActionExecuted(ActionExecutedContext context)
         {
@@ -48,9 +48,10 @@ namespace Trumgu_IntegratedManageSystem.Filters
                     throw new Exception("用户身份验证失败！");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 context.HttpContext.Response.Redirect("/Login/Index?t=" + DateTime.Now.ToFileTimeUtc(), true);
+                throw ex;
             }
         }
     }

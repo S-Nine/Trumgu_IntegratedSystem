@@ -10,6 +10,7 @@
     <PackageReference Include="MySql.Data" Version="8.0.10-rc" />
     <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="8.0.10-rc" />
     <PackageReference Include="MySql.Data.EntityFrameworkCore.Design" Version="8.0.10-rc" />
+    <PackageReference Include="ZKWeb.System.Drawing" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup>

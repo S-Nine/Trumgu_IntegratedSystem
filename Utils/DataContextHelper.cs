@@ -13,7 +13,9 @@ namespace Trumgu_IntegratedManageSystem.Utils
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseMySQL(@"server=127.0.0.1;port=3306;database=trumgu_ims_db;uid=root;pwd=Cy616620664.;charset='utf8';SslMode=None;");
+        {
+            // optionsBuilder.UseMySQL(@"server=127.0.0.1;port=3306;database=trumgu_ims_db;uid=root;pwd=Cy616620664.;charset='utf8';SslMode=None;");
+        }
 
         /// <summary>
         /// 系统菜单表
