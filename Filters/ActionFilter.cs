@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Trumgu_IntegratedManageSystem.Models;
 
 namespace Trumgu_IntegratedManageSystem.Filters
 {
@@ -50,7 +51,34 @@ namespace Trumgu_IntegratedManageSystem.Filters
             }
             catch (Exception ex)
             {
-                context.HttpContext.Response.Redirect("/Login/Index?t=" + DateTime.Now.ToFileTimeUtc(), true);
+                // 判断是否为ajax
+                bool isAjax = false;
+                var dic = context.HttpContext.Request.Headers;
+                foreach (var o in dic)
+                {
+                    if (o.Key == "X-Requested-With")
+                    {
+                        var v = o.Value[0];
+                        for (int i = 0; i < v.Length; i++)
+                        {
+                            if (v[i].ToString().ToLower() == "XMLHttpRequest".ToLower())
+                            {
+                                isAjax = true;
+                            }
+                        }
+                    }
+                }
+
+                if (isAjax)
+                {
+                    context.HttpContext.Response.ContentType = "text/html";
+                    ResultObj ro = new ResultObj() { code = (int)EResponseState.TRUMGU_IMS_Unauthorized, msg = EResponseState.TRUMGU_IMS_Unauthorized.ToString() };
+                    context.HttpContext.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(ro));
+                }
+                else
+                {
+                    context.HttpContext.Response.Redirect("/Error/Error401?t=" + DateTime.Now.ToFileTimeUtc() , true);
+                }
                 throw ex;
             }
         }

@@ -33,12 +33,15 @@ namespace Trumgu_IntegratedManageSystem
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
+                app.UseExceptionHandler("/Error/ErrorJump/{0}");
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error/ErrorJump/{0}");
             }
+
+            app.UseStatusCodePagesWithReExecute("/Error/ErrorJump/{0}");
 
             app.UseStaticFiles();
             // 启用Session
