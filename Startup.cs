@@ -50,7 +50,7 @@ namespace Trumgu_IntegratedManageSystem
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Login}/{action=Index}/{id?}");
+                    template: "{controller=Login}/{action=Jump}/{id?}");
             });
         }
     }

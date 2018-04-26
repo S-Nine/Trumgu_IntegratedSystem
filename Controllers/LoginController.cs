@@ -192,5 +192,12 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             HttpContext.Session.SetString("VCode", vcode);
             return File(ms.ToArray(), @"image/png");
         }
+
+        public IActionResult Jump()
+        {
+
+            HttpContext.Response.Redirect("/Login/Index?t=" + DateTime.Now.ToFileTimeUtc() , true);
+            return View();   
+        }
     }
 }

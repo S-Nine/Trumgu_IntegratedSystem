@@ -1061,5 +1061,14 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             db.Dispose();
             return Json(ro);
         }
+        
+        /// <summary>
+        /// 用户页面初始化
+        /// <summary>
+        /// <returns></returns>
+        public IActionResult Users()
+        {
+            return View();
+        }
     }
 }
