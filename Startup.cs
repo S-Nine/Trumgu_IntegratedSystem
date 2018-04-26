@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Trumgu_IntegratedManageSystem.Filters;
@@ -21,8 +22,16 @@ namespace Trumgu_IntegratedManageSystem
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {   
-            services.AddMvc(cfg=>{
+        {
+            services.Configure<FormOptions>(opt =>
+            {
+                opt.ValueLengthLimit = int.MaxValue;
+                opt.MultipartBodyLengthLimit = int.MaxValue;
+                opt.BufferBodyLengthLimit=long.MaxValue;
+                opt.ValueCountLimit=int.MaxValue;
+            });
+            services.AddMvc(cfg =>
+            {
                 cfg.Filters.Add(new ActionFilter());
             });
             services.AddSession();

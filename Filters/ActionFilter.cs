@@ -12,7 +12,7 @@ namespace Trumgu_IntegratedManageSystem.Filters
         /// <summary>
         /// 免验证Controller列表
         /// </summary>
-        private List<string> No_Verification_Controller = new List<string>() { "Error", "Login" };
+        private List<string> No_Verification_Controller = new List<string>() { "Error", "Login", "Public" };
         /// <summary>
         /// 免验证Action列表（格式：ControllerName/ActionName）
         /// </summary>
@@ -77,7 +77,7 @@ namespace Trumgu_IntegratedManageSystem.Filters
                 }
                 else
                 {
-                    context.HttpContext.Response.Redirect("/Error/Error401?t=" + DateTime.Now.ToFileTimeUtc() , true);
+                    context.HttpContext.Response.Redirect("/Error/Error401?t=" + DateTime.Now.ToFileTimeUtc(), true);
                 }
                 throw ex;
             }
