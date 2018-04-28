@@ -82,4 +82,22 @@ namespace Trumgu_IntegratedManageSystem.Models.sys
         /// </summary>
         public DateTime? create_time { get { return _create_time; } set { _create_time = value; } }
     }
+
+    public class t_sys_userSelObj
+    {
+        /// <summary>
+        /// 每页显示的行数
+        /// </summary>
+        public int? rows{get;set;}
+
+        /// <summary>
+        /// 页数
+        /// </summary>
+        public int? page{get;set;}
+
+        /// <summary>
+        /// 模糊搜索名称
+        /// </summary>
+        public string name_like{get;set;}
+    }
 }
