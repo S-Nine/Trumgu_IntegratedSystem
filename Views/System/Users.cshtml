@@ -28,6 +28,40 @@
 			<table id="users_datagrid" title="用户列表"></table> 
 		</div>
 	</div>
+	<div id="dlg_add_user" class="easyui-dialog" title="编辑用户" style="width:310px;height:280px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<input type="hidden" id="hid_id" value=""/>
+		<div style="margin-top:5px;">
+			<span>用户名称：</span>
+			<input id="txt_name" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>登录名称：</span>
+			<input id="txt_login_name" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>登录密码：</span>
+			<input id="txt_login_pwd" class="easyui-passwordbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>联系电话：</span>
+			<input id="txt_tel" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['mobile']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;邮箱：</span>
+			<input id="txt_email" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['email']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;性别：</span>
+			<input type="radio" name="rad_gender" id="rad_gender0" value="0"/><label for="rad_gender0">女</label>&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="radio" name="rad_gender" id="rad_gender1" value="1" checked="checked"/><label for="rad_gender1">男</label>
+		</div>
+		<div style="margin-top:5px;">
+			<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;状态：</span>
+			<input type="radio" name="rad_state" id="rad_state0" value="0"/><label for="rad_state0">禁用</label>
+			<input type="radio" name="rad_state" id="rad_state1" value="1" checked="checked"/><label for="rad_state0">启用</label>
+		</div>
+	</div>
 	<script type="text/javascript" src="~/js/system/users.js?t=@DateTime.Now.ToFileTimeUtc()"></script>
 </body>
 </html>
