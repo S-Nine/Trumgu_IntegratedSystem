@@ -4,16 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Trumgu_IntegratedManageSystem.Models;
 using Trumgu_IntegratedManageSystem.Models.sys;
 
-namespace Trumgu_IntegratedManageSystem.Utils
-{
-    public class DataContextHelper : DbContext
-    {
-        public DataContextHelper(DbContextOptions<DataContextHelper> options) : base(options)
-        {
-        }
+namespace Trumgu_IntegratedManageSystem.Utils {
+    public class DataContextHelper : DbContext {
+        public DataContextHelper (DbContextOptions<DataContextHelper> options) : base (options) { }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
+        protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder) {
             // optionsBuilder.UseMySQL(@"server=127.0.0.1;port=3306;database=trumgu_ims_db;uid=root;pwd=Cy616620664.;charset='utf8';SslMode=None;");
         }
 
@@ -61,5 +56,25 @@ namespace Trumgu_IntegratedManageSystem.Utils
         /// 菜单树
         /// </summary>
         public DbSet<MenuTreeDataObj> MenuTreeData { get; set; }
+
+        /// <summary>
+        /// 用户部门树
+        /// </summary>
+        public DbSet<UserDelpartmentTreeDataObj> UserDelpartmentTreeData { get; set; }
+
+        /// <summary>
+        /// 用户角色树
+        /// </summary>
+        public DbSet<UserRoleTreeDataObj> UserRoleTreeData { get; set; }
+
+        /// <summary>
+        /// 公告文档
+        /// </summary>
+        public DbSet<t_assets_noticeObj> t_assets_notice { get; set; }
+
+        /// <summary>
+        /// 附件
+        /// </summary>
+        public DbSet<t_sys_fileObj> t_sys_file { get; set; }
     }
 }

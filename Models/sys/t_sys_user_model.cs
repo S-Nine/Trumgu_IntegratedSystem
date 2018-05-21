@@ -1,9 +1,7 @@
 using System;
 
-namespace Trumgu_IntegratedManageSystem.Models.sys
-{
-    public class t_sys_userObj
-    {
+namespace Trumgu_IntegratedManageSystem.Models.sys {
+    public class t_sys_userObj {
         private int? _id = null;
         /// <summary>
         /// 主键
@@ -81,5 +79,15 @@ namespace Trumgu_IntegratedManageSystem.Models.sys
         /// 创建日期
         /// </summary>
         public DateTime? create_time { get { return _create_time; } set { _create_time = value; } }
+    }
+
+    public class t_sys_userSelObj {
+        /// <summary>
+        /// 角色名称
+        /// </summary>
+        public string name_like { get; set; }
+
+        public int? page { get; set; }
+        public int? rows { get; set; }
     }
 }

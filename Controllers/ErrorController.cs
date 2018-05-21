@@ -14,15 +14,6 @@ namespace Trumgu_IntegratedManageSystem.Controllers
     public class ErrorController : Controller
     {
         /// <summary>
-        /// 未经授权
-        /// </summary>
-
-        public IActionResult Error401()
-        {
-            return View();
-        }
-
-        /// <summary>
         /// 页面丢失
         /// </summary>
 
@@ -41,6 +32,15 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             {
                 Response.Redirect("/Error/Error401", true);
             }
+            return View();
+        }
+
+        /// <summary>
+        /// 未经授权
+        /// </summary>
+
+        public IActionResult Error401()
+        {
             return View();
         }
 

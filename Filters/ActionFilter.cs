@@ -46,6 +46,7 @@ namespace Trumgu_IntegratedManageSystem.Filters
                 string cUserInfo = context.HttpContext.Session.GetString("UserInfo");
                 if (string.IsNullOrWhiteSpace(cUserInfo))
                 {
+                    context.HttpContext.Response.Redirect("/Login/Index?t=" + DateTime.Now.ToFileTimeUtc(), true);
                     throw new Exception("用户身份验证失败！");
                 }
             }
@@ -77,9 +78,9 @@ namespace Trumgu_IntegratedManageSystem.Filters
                 }
                 else
                 {
-                    context.HttpContext.Response.Redirect("/Error/Error401?t=" + DateTime.Now.ToFileTimeUtc(), true);
+                   context.HttpContext.Response.Redirect("/Login/Index?t=" + DateTime.Now.ToFileTimeUtc(), true);
                 }
-                throw ex;
+                // throw ex;
             }
         }
     }

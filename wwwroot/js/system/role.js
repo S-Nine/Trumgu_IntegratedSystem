@@ -188,6 +188,9 @@ function initEvent() {
                         dataType: 'json',
                         data: { role_id: role_id, list: data },
                         success: function(data) {
+                            if ($('#right_save').linkbutton("options").disabled) {
+                                $('#right_save').linkbutton("enable");
+                            }
                             if (data != null && data.code == 200) {
                                 $.messager.alert('提示', '分配成功！');
                                 $('#dlg_add_right').dialog('close');
@@ -198,6 +201,9 @@ function initEvent() {
                         },
                         error: function() {
                             $.messager.alert('错误', '网络连接失败、请稍后再试！');
+                            if ($('#right_save').linkbutton("options").disabled) {
+                                $('#right_save').linkbutton("enable");
+                            }
                         }
                     });
                 }

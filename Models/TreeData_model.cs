@@ -58,4 +58,19 @@ namespace Trumgu_IntegratedManageSystem.Models
         public string type { get; set; }
         public int? sort { get; set; }
     }
+
+    public class UserDelpartmentTreeDataObj
+    {
+        public int? id {get;set;}
+        public string name {get;set;}
+        public int? parent_id {get;set;}
+        public string check{get;set;}
+    }
+
+    public class UserRoleTreeDataObj
+    {
+        public int? id {get;set;}
+        public string name {get;set;}
+        public string check{get;set;}
+    }
 }
