@@ -1109,7 +1109,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers {
                         t.children = RecursionDelpartment (list1, list_root[i].id);
                         list.Add (t);
                     }
-                }
+                } 
             }
             return Json (list);
         }
