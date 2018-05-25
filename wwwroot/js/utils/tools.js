@@ -29,3 +29,14 @@ function isValidate(id) {
         return false;
     }
 }
+
+/**
+ * 判断数组是否包含指定元素
+ * @param {*} needle 
+ */
+Array.prototype.contains = function(needle) {
+    for (i in this) {
+        if (this[i] == needle) return true;
+    }
+    return false;
+}

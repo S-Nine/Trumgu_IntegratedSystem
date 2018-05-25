@@ -3,12 +3,16 @@ using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Trumgu_IntegratedManageSystem.Models;
 using Trumgu_IntegratedManageSystem.Models.sys;
+using Trumgu_IntegratedManageSystem.Models.xfund;
 
-namespace Trumgu_IntegratedManageSystem.Utils {
-    public class DataContextHelper : DbContext {
-        public DataContextHelper (DbContextOptions<DataContextHelper> options) : base (options) { }
+namespace Trumgu_IntegratedManageSystem.Utils
+{
+    public class DataContextHelper : DbContext
+    {
+        public DataContextHelper(DbContextOptions<DataContextHelper> options) : base(options) { }
 
-        protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder) {
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
             // optionsBuilder.UseMySQL(@"server=127.0.0.1;port=3306;database=trumgu_ims_db;uid=root;pwd=Cy616620664.;charset='utf8';SslMode=None;");
         }
 
@@ -76,5 +80,17 @@ namespace Trumgu_IntegratedManageSystem.Utils {
         /// 附件
         /// </summary>
         public DbSet<t_sys_fileObj> t_sys_file { get; set; }
+
+        /// <summary>
+        /// XFund用户登录详情表
+        /// </summary>
+        public DbSet<t_xfund_user_login_infoObj> t_xfund_user_login_info { get; set; }
+
+        /// <summary>
+        /// XFund用户菜单使用详情表
+        /// </summary>
+        public DbSet<t_xfund_user_call_logObj> t_xfund_user_call_log { get; set; }
+
+        public DbSet<OperationStatisticsObj> OperationStatistics { get; set; }
     }
 }

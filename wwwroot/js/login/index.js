@@ -1,4 +1,7 @@
 $(function() {
+    if (window.frames.length != parent.frames.length) {　　
+        window.parent.location.href = '/login/index/';
+    }
     $('#btn_login').click(login);
     $('body').bind('keyup', function(event) {
         if (event.keyCode == "13") {

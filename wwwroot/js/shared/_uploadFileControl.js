@@ -1,11 +1,11 @@
-jQuery(function () {
-    var $ = jQuery,    // just in case. Make sure it's not an other libaray.
+jQuery(function() {
+    var $ = jQuery, // just in case. Make sure it's not an other libaray.
 
         $wrap = $('#uploader'),
 
         // 图片容器
         $queue = $('<ul class="filelist"></ul>')
-            .appendTo($wrap.find('.queueList')),
+        .appendTo($wrap.find('.queueList')),
 
         // 状态栏，包括进度和控制按钮
         $statusBar = $wrap.find('.statusBar'),
@@ -41,13 +41,13 @@ jQuery(function () {
         // 所有文件的进度信息，key为file id
         percentages = {},
 
-        supportTransition = (function () {
+        supportTransition = (function() {
             var s = document.createElement('p').style,
                 r = 'transition' in s ||
-                    'WebkitTransition' in s ||
-                    'MozTransition' in s ||
-                    'msTransition' in s ||
-                    'OTransition' in s;
+                'WebkitTransition' in s ||
+                'MozTransition' in s ||
+                'msTransition' in s ||
+                'OTransition' in s;
             s = null;
             return r;
         })(),
@@ -64,16 +64,20 @@ jQuery(function () {
     uploader = WebUploader.create({
         pick: {
             id: '#filePicker',
-            label: '点击选择图片'
+            label: '点击选择文件'
         },
         dnd: '#uploader .queueList',
         paste: document.body,
 
-        accept: {
+        accept: [{
             title: 'Images',
             extensions: 'gif,jpg,jpeg,bmp,png',
             mimeTypes: 'image/*'
-        },
+        }, {
+            title: 'office',
+            extensions: 'xls，xlsx,doc',
+            mimeTypes: 'application/msword'
+        }],
 
         // swf文件路径
         swf: '../lib/webuploader-0.1.5/Uploader.swf',
@@ -84,8 +88,8 @@ jQuery(function () {
         // server: 'http://webuploader.duapp.com/server/fileupload.php',
         server: 'http://2betop.net/fileupload.php',
         fileNumLimit: 300,
-        fileSizeLimit: 5 * 1024 * 1024,    // 200 M
-        fileSingleSizeLimit: 1 * 1024 * 1024    // 50 M
+        fileSizeLimit: 5 * 1024 * 1024, // 200 M
+        fileSingleSizeLimit: 1 * 1024 * 1024 // 50 M
     });
 
     // 添加“添加文件”的按钮，
@@ -97,10 +101,10 @@ jQuery(function () {
     // 当有文件添加进来时执行，负责view的创建
     function addFile(file) {
         var $li = $('<li id="' + file.id + '">' +
-            '<p class="title">' + file.name + '</p>' +
-            '<p class="imgWrap"></p>' +
-            '<p class="progress"><span></span></p>' +
-            '</li>'),
+                '<p class="title">' + file.name + '</p>' +
+                '<p class="imgWrap"></p>' +
+                '<p class="progress"><span></span></p>' +
+                '</li>'),
 
             $btns = $('<div class="file-panel">' +
                 '<span class="cancel">删除</span>' +
@@ -110,7 +114,7 @@ jQuery(function () {
             $wrap = $li.find('p.imgWrap'),
             $info = $('<p class="error"></p>'),
 
-            showError = function (code) {
+            showError = function(code) {
                 switch (code) {
                     case 'exceed_size':
                         text = '文件大小超出';
@@ -133,7 +137,7 @@ jQuery(function () {
         } else {
             // @todo lazyload
             $wrap.text('预览中');
-            uploader.makeThumb(file, function (error, src) {
+            uploader.makeThumb(file, function(error, src) {
                 if (error) {
                     $wrap.text('不能预览');
                     return;
@@ -147,7 +151,7 @@ jQuery(function () {
             file.rotation = 0;
         }
 
-        file.on('statuschange', function (cur, prev) {
+        file.on('statuschange', function(cur, prev) {
             if (prev === 'progress') {
                 $prgress.hide().width(0);
             } else if (prev === 'queued') {
@@ -174,15 +178,15 @@ jQuery(function () {
             $li.removeClass('state-' + prev).addClass('state-' + cur);
         });
 
-        $li.on('mouseenter', function () {
+        $li.on('mouseenter', function() {
             $btns.stop().animate({ height: 30 });
         });
 
-        $li.on('mouseleave', function () {
+        $li.on('mouseleave', function() {
             $btns.stop().animate({ height: 0 });
         });
 
-        $btns.on('click', 'span', function () {
+        $btns.on('click', 'span', function() {
             var index = $(this).index(),
                 deg;
 
@@ -249,7 +253,7 @@ jQuery(function () {
             spans = $progress.children(),
             percent;
 
-        $.each(percentages, function (k, v) {
+        $.each(percentages, function(k, v) {
             total += v[0];
             loaded += v[0] * v[1];
         });
@@ -262,26 +266,27 @@ jQuery(function () {
     }
 
     function updateStatus() {
-        var text = '', stats;
+        var text = '',
+            stats;
 
         if (state === 'ready') {
-            text = '选中' + fileCount + '张图片，共' +
+            text = '选中' + fileCount + '个文件，共' +
                 WebUploader.formatSize(fileSize) + '。';
         } else if (state === 'confirm') {
             stats = uploader.getStats();
             if (stats.uploadFailNum) {
-                text = '已成功上传' + stats.successNum + '张照片至XX相册，' +
-                    stats.uploadFailNum + '张照片上传失败，<a class="retry" href="#">重新上传</a>失败图片或<a class="ignore" href="#">忽略</a>'
+                text = '已成功上传' + stats.successNum + '个文件，' +
+                    stats.uploadFailNum + '个文件上传失败，<a class="retry" href="#">重新上传</a>失败文件或<a class="ignore" href="#">忽略</a>'
             }
 
         } else {
             stats = uploader.getStats();
-            text = '共' + fileCount + '张（' +
+            text = '共' + fileCount + '个（' +
                 WebUploader.formatSize(fileSize) +
-                '），已上传' + stats.successNum + '张';
+                '），已上传' + stats.successNum + '个';
 
             if (stats.uploadFailNum) {
-                text += '，失败' + stats.uploadFailNum + '张';
+                text += '，失败' + stats.uploadFailNum + '个';
             }
         }
 
@@ -353,7 +358,7 @@ jQuery(function () {
         updateStatus();
     }
 
-    uploader.onUploadProgress = function (file, percentage) {
+    uploader.onUploadProgress = function(file, percentage) {
         var $li = $('#' + file.id),
             $percent = $li.find('.progress span');
 
@@ -362,7 +367,7 @@ jQuery(function () {
         updateTotalProgress();
     };
 
-    uploader.onFileQueued = function (file) {
+    uploader.onFileQueued = function(file) {
         fileCount++;
         fileSize += file.size;
 
@@ -376,7 +381,7 @@ jQuery(function () {
         updateTotalProgress();
     };
 
-    uploader.onFileDequeued = function (file) {
+    uploader.onFileDequeued = function(file) {
         fileCount--;
         fileSize -= file.size;
 
@@ -389,7 +394,7 @@ jQuery(function () {
 
     };
 
-    uploader.on('all', function (type) {
+    uploader.on('all', function(type) {
         var stats;
         switch (type) {
             case 'uploadFinished':
@@ -407,11 +412,11 @@ jQuery(function () {
         }
     });
 
-    uploader.onError = function (code) {
+    uploader.onError = function(code) {
         alert('Eroor: ' + code);
     };
 
-    $upload.on('click', function () {
+    $upload.on('click', function() {
         if ($(this).hasClass('disabled')) {
             return false;
         }
@@ -425,11 +430,11 @@ jQuery(function () {
         }
     });
 
-    $info.on('click', '.retry', function () {
+    $info.on('click', '.retry', function() {
         uploader.retry();
     });
 
-    $info.on('click', '.ignore', function () {
+    $info.on('click', '.ignore', function() {
         alert('todo');
     });
 
