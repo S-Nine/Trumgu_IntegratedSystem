@@ -1,11 +1,12 @@
-jQuery(function() {
+var uploader = null;
+jQuery(function () {
     var $ = jQuery, // just in case. Make sure it's not an other libaray.
 
         $wrap = $('#uploader'),
 
         // 图片容器
         $queue = $('<ul class="filelist"></ul>')
-        .appendTo($wrap.find('.queueList')),
+            .appendTo($wrap.find('.queueList')),
 
         // 状态栏，包括进度和控制按钮
         $statusBar = $wrap.find('.statusBar'),
@@ -41,19 +42,16 @@ jQuery(function() {
         // 所有文件的进度信息，key为file id
         percentages = {},
 
-        supportTransition = (function() {
+        supportTransition = (function () {
             var s = document.createElement('p').style,
                 r = 'transition' in s ||
-                'WebkitTransition' in s ||
-                'MozTransition' in s ||
-                'msTransition' in s ||
-                'OTransition' in s;
+                    'WebkitTransition' in s ||
+                    'MozTransition' in s ||
+                    'msTransition' in s ||
+                    'OTransition' in s;
             s = null;
             return r;
-        })(),
-
-        // WebUploader实例
-        uploader;
+        })();
 
     if (!WebUploader.Uploader.support()) {
         alert('Web Uploader 不支持您的浏览器！如果你使用的是IE浏览器，请尝试升级 flash 播放器');
@@ -70,14 +68,19 @@ jQuery(function() {
         paste: document.body,
 
         accept: [{
-            title: 'Images',
-            extensions: 'gif,jpg,jpeg,bmp,png',
-            mimeTypes: 'image/*'
-        }, {
-            title: 'office',
-            extensions: 'xls，xlsx,doc',
-            mimeTypes: 'application/msword'
-        }],
+            title: 'Files',
+            extensions: 'gif,jpg,jpeg,bmp,png,pdf,doc,docx,txt,xls,xlsx,ppt,pptx,zip,mp3,mp4,text,csv',
+            mimeTypes: 'image/*,text/*'
+                //word
+                + ',application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                //excel
+                + ',application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                //ppt
+                + ',application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                + ',application/pdf'
+                + ',application/zip'
+                + ',application/csv'
+        },],
 
         // swf文件路径
         swf: '../lib/webuploader-0.1.5/Uploader.swf',
@@ -85,11 +88,10 @@ jQuery(function() {
         disableGlobalDnd: true,
 
         chunked: true,
-        // server: 'http://webuploader.duapp.com/server/fileupload.php',
-        server: 'http://2betop.net/fileupload.php',
+        server: '/Public/UploadFile/',
         fileNumLimit: 300,
-        fileSizeLimit: 5 * 1024 * 1024, // 200 M
-        fileSingleSizeLimit: 1 * 1024 * 1024 // 50 M
+        fileSizeLimit: 100 * 1024 * 1024,
+        fileSingleSizeLimit: 100 * 1024 * 1024
     });
 
     // 添加“添加文件”的按钮，
@@ -100,21 +102,19 @@ jQuery(function() {
 
     // 当有文件添加进来时执行，负责view的创建
     function addFile(file) {
-        var $li = $('<li id="' + file.id + '">' +
-                '<p class="title">' + file.name + '</p>' +
-                '<p class="imgWrap"></p>' +
-                '<p class="progress"><span></span></p>' +
-                '</li>'),
+        var $li = $('<li id="' + file.id + '" style="height:120px;">' +
+            '<p class="title" style="z-index:999;top:105px;">' + file.name + '</p>' +
+            '<p class="imgWrap"></p>' +
+            '<p class="progress"><span></span></p>' +
+            '</li>'),
 
             $btns = $('<div class="file-panel">' +
-                '<span class="cancel">删除</span>' +
-                '<span class="rotateRight">向右旋转</span>' +
-                '<span class="rotateLeft">向左旋转</span></div>').appendTo($li),
+                '<span class="cancel" style="display:contents;color:red;">删除</span>' + '</div>').appendTo($li),
             $prgress = $li.find('p.progress span'),
             $wrap = $li.find('p.imgWrap'),
             $info = $('<p class="error"></p>'),
 
-            showError = function(code) {
+            showError = function (code) {
                 switch (code) {
                     case 'exceed_size':
                         text = '文件大小超出';
@@ -137,9 +137,11 @@ jQuery(function() {
         } else {
             // @todo lazyload
             $wrap.text('预览中');
-            uploader.makeThumb(file, function(error, src) {
+            uploader.makeThumb(file, function (error, src) {
                 if (error) {
-                    $wrap.text('不能预览');
+                    // $wrap.text('不能预览');
+                    var img = $('<img src="../../images/unknown_type.png">');
+                    $wrap.empty().append(img);
                     return;
                 }
 
@@ -151,7 +153,7 @@ jQuery(function() {
             file.rotation = 0;
         }
 
-        file.on('statuschange', function(cur, prev) {
+        file.on('statuschange', function (cur, prev) {
             if (prev === 'progress') {
                 $prgress.hide().width(0);
             } else if (prev === 'queued') {
@@ -178,15 +180,15 @@ jQuery(function() {
             $li.removeClass('state-' + prev).addClass('state-' + cur);
         });
 
-        $li.on('mouseenter', function() {
+        $li.on('mouseenter', function () {
             $btns.stop().animate({ height: 30 });
         });
 
-        $li.on('mouseleave', function() {
+        $li.on('mouseleave', function () {
             $btns.stop().animate({ height: 0 });
         });
 
-        $btns.on('click', 'span', function() {
+        $btns.on('click', 'span', function () {
             var index = $(this).index(),
                 deg;
 
@@ -253,7 +255,7 @@ jQuery(function() {
             spans = $progress.children(),
             percent;
 
-        $.each(percentages, function(k, v) {
+        $.each(percentages, function (k, v) {
             total += v[0];
             loaded += v[0] * v[1];
         });
@@ -358,7 +360,7 @@ jQuery(function() {
         updateStatus();
     }
 
-    uploader.onUploadProgress = function(file, percentage) {
+    uploader.onUploadProgress = function (file, percentage) {
         var $li = $('#' + file.id),
             $percent = $li.find('.progress span');
 
@@ -367,7 +369,7 @@ jQuery(function() {
         updateTotalProgress();
     };
 
-    uploader.onFileQueued = function(file) {
+    uploader.onFileQueued = function (file) {
         fileCount++;
         fileSize += file.size;
 
@@ -381,7 +383,7 @@ jQuery(function() {
         updateTotalProgress();
     };
 
-    uploader.onFileDequeued = function(file) {
+    uploader.onFileDequeued = function (file) {
         fileCount--;
         fileSize -= file.size;
 
@@ -394,7 +396,7 @@ jQuery(function() {
 
     };
 
-    uploader.on('all', function(type) {
+    uploader.on('all', function (type) {
         var stats;
         switch (type) {
             case 'uploadFinished':
@@ -412,11 +414,11 @@ jQuery(function() {
         }
     });
 
-    uploader.onError = function(code) {
+    uploader.onError = function (code) {
         alert('Eroor: ' + code);
     };
 
-    $upload.on('click', function() {
+    $upload.on('click', function () {
         if ($(this).hasClass('disabled')) {
             return false;
         }
@@ -430,14 +432,26 @@ jQuery(function() {
         }
     });
 
-    $info.on('click', '.retry', function() {
+    $info.on('click', '.retry', function () {
         uploader.retry();
     });
 
-    $info.on('click', '.ignore', function() {
+    $info.on('click', '.ignore', function () {
         alert('todo');
     });
 
     $upload.addClass('state-' + state);
     updateTotalProgress();
 });
+
+function uploaderReset() {
+    var cancel = $('.cancel');
+    if(cancel!=null){
+        for(var i =0;i<cancel.length;i++){
+            $(cancel[i]).click();
+        }
+    }
+    if (uploader != null) {
+        uploader.reset();
+    }
+}

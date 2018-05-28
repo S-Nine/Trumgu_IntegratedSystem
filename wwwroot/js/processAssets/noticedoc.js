@@ -13,6 +13,8 @@ function initButtonEvent() {
 
     $('#btn_add') != null && $('#btn_add').click(function () {
         // cleanAddUserDialog();
+        uploaderReset();
+        
         $('#dlg_add_notice').dialog('open');
     });
 }
