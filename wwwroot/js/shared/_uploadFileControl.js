@@ -1,457 +1,147 @@
-var uploader = null;
-jQuery(function () {
-    var $ = jQuery, // just in case. Make sure it's not an other libaray.
-
-        $wrap = $('#uploader'),
-
-        // 图片容器
-        $queue = $('<ul class="filelist"></ul>')
-            .appendTo($wrap.find('.queueList')),
-
-        // 状态栏，包括进度和控制按钮
-        $statusBar = $wrap.find('.statusBar'),
-
-        // 文件总体选择信息。
-        $info = $statusBar.find('.info'),
-
-        // 上传按钮
-        $upload = $wrap.find('.uploadBtn'),
-
-        // 没选择文件之前的内容。
-        $placeHolder = $wrap.find('.placeholder'),
-
-        // 总体进度条
-        $progress = $statusBar.find('.progress').hide(),
-
-        // 添加的文件数量
-        fileCount = 0,
-
-        // 添加的文件总大小
-        fileSize = 0,
-
-        // 优化retina, 在retina下这个值是2
-        ratio = window.devicePixelRatio || 1,
-
-        // 缩略图大小
-        thumbnailWidth = 110 * ratio,
-        thumbnailHeight = 110 * ratio,
-
-        // 可能有pedding, ready, uploading, confirm, done.
-        state = 'pedding',
-
-        // 所有文件的进度信息，key为file id
-        percentages = {},
-
-        supportTransition = (function () {
-            var s = document.createElement('p').style,
-                r = 'transition' in s ||
-                    'WebkitTransition' in s ||
-                    'MozTransition' in s ||
-                    'msTransition' in s ||
-                    'OTransition' in s;
-            s = null;
-            return r;
-        })();
-
-    if (!WebUploader.Uploader.support()) {
-        alert('Web Uploader 不支持您的浏览器！如果你使用的是IE浏览器，请尝试升级 flash 播放器');
-        throw new Error('WebUploader does not support the browser you are using.');
-    }
-
-    // 实例化
-    uploader = WebUploader.create({
-        pick: {
-            id: '#filePicker',
-            label: '点击选择文件'
-        },
-        dnd: '#uploader .queueList',
-        paste: document.body,
-
-        accept: [{
-            title: 'Files',
-            extensions: 'gif,jpg,jpeg,bmp,png,pdf,doc,docx,txt,xls,xlsx,ppt,pptx,zip,mp3,mp4,text,csv',
-            mimeTypes: 'image/*,text/*'
-                //word
-                + ',application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                //excel
-                + ',application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                //ppt
-                + ',application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation'
-                + ',application/pdf'
-                + ',application/zip'
-                + ',application/csv'
-        },],
-
-        // swf文件路径
-        swf: '../lib/webuploader-0.1.5/Uploader.swf',
-
-        disableGlobalDnd: true,
-
-        chunked: true,
-        server: '/Public/UploadFile/',
-        fileNumLimit: 300,
-        fileSizeLimit: 100 * 1024 * 1024,
-        fileSingleSizeLimit: 100 * 1024 * 1024
-    });
-
-    // 添加“添加文件”的按钮，
-    uploader.addButton({
-        id: '#filePicker2',
-        label: '继续添加'
-    });
-
-    // 当有文件添加进来时执行，负责view的创建
-    function addFile(file) {
-        var $li = $('<li id="' + file.id + '" style="height:120px;">' +
-            '<p class="title" style="z-index:999;top:105px;">' + file.name + '</p>' +
-            '<p class="imgWrap"></p>' +
-            '<p class="progress"><span></span></p>' +
-            '</li>'),
-
-            $btns = $('<div class="file-panel">' +
-                '<span class="cancel" style="display:contents;color:red;">删除</span>' + '</div>').appendTo($li),
-            $prgress = $li.find('p.progress span'),
-            $wrap = $li.find('p.imgWrap'),
-            $info = $('<p class="error"></p>'),
-
-            showError = function (code) {
-                switch (code) {
-                    case 'exceed_size':
-                        text = '文件大小超出';
-                        break;
-
-                    case 'interrupt':
-                        text = '上传暂停';
-                        break;
-
-                    default:
-                        text = '上传失败，请重试';
-                        break;
-                }
-
-                $info.text(text).appendTo($li);
-            };
-
-        if (file.getStatus() === 'invalid') {
-            showError(file.statusText);
-        } else {
-            // @todo lazyload
-            $wrap.text('预览中');
-            uploader.makeThumb(file, function (error, src) {
-                if (error) {
-                    // $wrap.text('不能预览');
-                    var img = $('<img src="../../images/unknown_type.png">');
-                    $wrap.empty().append(img);
-                    return;
-                }
-
-                var img = $('<img src="' + src + '">');
-                $wrap.empty().append(img);
-            }, thumbnailWidth, thumbnailHeight);
-
-            percentages[file.id] = [file.size, 0];
-            file.rotation = 0;
-        }
-
-        file.on('statuschange', function (cur, prev) {
-            if (prev === 'progress') {
-                $prgress.hide().width(0);
-            } else if (prev === 'queued') {
-                $li.off('mouseenter mouseleave');
-                $btns.remove();
-            }
-
-            // 成功
-            if (cur === 'error' || cur === 'invalid') {
-                console.log(file.statusText);
-                showError(file.statusText);
-                percentages[file.id][1] = 1;
-            } else if (cur === 'interrupt') {
-                showError('interrupt');
-            } else if (cur === 'queued') {
-                percentages[file.id][1] = 0;
-            } else if (cur === 'progress') {
-                $info.remove();
-                $prgress.css('display', 'block');
-            } else if (cur === 'complete') {
-                $li.append('<span class="success"></span>');
-            }
-
-            $li.removeClass('state-' + prev).addClass('state-' + cur);
-        });
-
-        $li.on('mouseenter', function () {
-            $btns.stop().animate({ height: 30 });
-        });
-
-        $li.on('mouseleave', function () {
-            $btns.stop().animate({ height: 0 });
-        });
-
-        $btns.on('click', 'span', function () {
-            var index = $(this).index(),
-                deg;
-
-            switch (index) {
-                case 0:
-                    uploader.removeFile(file);
-                    return;
-
-                case 1:
-                    file.rotation += 90;
-                    break;
-
-                case 2:
-                    file.rotation -= 90;
-                    break;
-            }
-
-            if (supportTransition) {
-                deg = 'rotate(' + file.rotation + 'deg)';
-                $wrap.css({
-                    '-webkit-transform': deg,
-                    '-mos-transform': deg,
-                    '-o-transform': deg,
-                    'transform': deg
-                });
-            } else {
-                $wrap.css('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=' + (~~((file.rotation / 90) % 4 + 4) % 4) + ')');
-                // use jquery animate to rotation
-                // $({
-                //     rotation: rotation
-                // }).animate({
-                //     rotation: file.rotation
-                // }, {
-                //     easing: 'linear',
-                //     step: function( now ) {
-                //         now = now * Math.PI / 180;
-
-                //         var cos = Math.cos( now ),
-                //             sin = Math.sin( now );
-
-                //         $wrap.css( 'filter', "progid:DXImageTransform.Microsoft.Matrix(M11=" + cos + ",M12=" + (-sin) + ",M21=" + sin + ",M22=" + cos + ",SizingMethod='auto expand')");
-                //     }
-                // });
-            }
-
-
-        });
-
-        $li.appendTo($queue);
-    }
-
-    // 负责view的销毁
-    function removeFile(file) {
-        var $li = $('#' + file.id);
-
-        delete percentages[file.id];
-        updateTotalProgress();
-        $li.off().find('.file-panel').off().end().remove();
-    }
-
-    function updateTotalProgress() {
-        var loaded = 0,
-            total = 0,
-            spans = $progress.children(),
-            percent;
-
-        $.each(percentages, function (k, v) {
-            total += v[0];
-            loaded += v[0] * v[1];
-        });
-
-        percent = total ? loaded / total : 0;
-
-        spans.eq(0).text(Math.round(percent * 100) + '%');
-        spans.eq(1).css('width', Math.round(percent * 100) + '%');
-        updateStatus();
-    }
-
-    function updateStatus() {
-        var text = '',
-            stats;
-
-        if (state === 'ready') {
-            text = '选中' + fileCount + '个文件，共' +
-                WebUploader.formatSize(fileSize) + '。';
-        } else if (state === 'confirm') {
-            stats = uploader.getStats();
-            if (stats.uploadFailNum) {
-                text = '已成功上传' + stats.successNum + '个文件，' +
-                    stats.uploadFailNum + '个文件上传失败，<a class="retry" href="#">重新上传</a>失败文件或<a class="ignore" href="#">忽略</a>'
-            }
-
-        } else {
-            stats = uploader.getStats();
-            text = '共' + fileCount + '个（' +
-                WebUploader.formatSize(fileSize) +
-                '），已上传' + stats.successNum + '个';
-
-            if (stats.uploadFailNum) {
-                text += '，失败' + stats.uploadFailNum + '个';
-            }
-        }
-
-        $info.html(text);
-    }
-
-    function setState(val) {
-        var file, stats;
-
-        if (val === state) {
-            return;
-        }
-
-        $upload.removeClass('state-' + state);
-        $upload.addClass('state-' + val);
-        state = val;
-
-        switch (state) {
-            case 'pedding':
-                $placeHolder.removeClass('element-invisible');
-                $queue.parent().removeClass('filled');
-                $queue.hide();
-                $statusBar.addClass('element-invisible');
-                uploader.refresh();
-                break;
-
-            case 'ready':
-                $placeHolder.addClass('element-invisible');
-                $('#filePicker2').removeClass('element-invisible');
-                $queue.parent().addClass('filled');
-                $queue.show();
-                $statusBar.removeClass('element-invisible');
-                uploader.refresh();
-                break;
-
-            case 'uploading':
-                $('#filePicker2').addClass('element-invisible');
-                $progress.show();
-                $upload.text('暂停上传');
-                break;
-
-            case 'paused':
-                $progress.show();
-                $upload.text('继续上传');
-                break;
-
-            case 'confirm':
-                $progress.hide();
-                $upload.text('开始上传').addClass('disabled');
-
-                stats = uploader.getStats();
-                if (stats.successNum && !stats.uploadFailNum) {
-                    setState('finish');
-                    return;
-                }
-                break;
-            case 'finish':
-                stats = uploader.getStats();
-                if (stats.successNum) {
-                    alert('上传成功');
-                } else {
-                    // 没有成功的图片，重设
-                    state = 'done';
-                    location.reload();
-                }
-                break;
-        }
-
-        updateStatus();
-    }
-
-    uploader.onUploadProgress = function (file, percentage) {
-        var $li = $('#' + file.id),
-            $percent = $li.find('.progress span');
-
-        $percent.css('width', percentage * 100 + '%');
-        percentages[file.id][1] = percentage;
-        updateTotalProgress();
-    };
-
-    uploader.onFileQueued = function (file) {
-        fileCount++;
-        fileSize += file.size;
-
-        if (fileCount === 1) {
-            $placeHolder.addClass('element-invisible');
-            $statusBar.show();
-        }
-
-        addFile(file);
-        setState('ready');
-        updateTotalProgress();
-    };
-
-    uploader.onFileDequeued = function (file) {
-        fileCount--;
-        fileSize -= file.size;
-
-        if (!fileCount) {
-            setState('pedding');
-        }
-
-        removeFile(file);
-        updateTotalProgress();
-
-    };
-
-    uploader.on('all', function (type) {
-        var stats;
-        switch (type) {
-            case 'uploadFinished':
-                setState('confirm');
-                break;
-
-            case 'startUpload':
-                setState('uploading');
-                break;
-
-            case 'stopUpload':
-                setState('paused');
-                break;
-
-        }
-    });
-
-    uploader.onError = function (code) {
-        alert('Eroor: ' + code);
-    };
-
-    $upload.on('click', function () {
-        if ($(this).hasClass('disabled')) {
-            return false;
-        }
-
-        if (state === 'ready') {
-            uploader.upload();
-        } else if (state === 'paused') {
-            uploader.upload();
-        } else if (state === 'uploading') {
-            uploader.stop();
-        }
-    });
-
-    $info.on('click', '.retry', function () {
-        uploader.retry();
-    });
-
-    $info.on('click', '.ignore', function () {
-        alert('todo');
-    });
-
-    $upload.addClass('state-' + state);
-    updateTotalProgress();
+var wait_file_list = [];
+$(document).ready(function() {
+    $('.filess').attr('accept', '.xls,xlsx,.doc,.ppt,.zip,.rar,.pdf,.jpg,.png');
+    $('.filess').change(selectFile);
 });
+/*
+ * 上传附件
+ */
+function addImage() {
+    $('.filess').click();
+}
 
-function uploaderReset() {
-    var cancel = $('.cancel');
-    if(cancel!=null){
-        for(var i =0;i<cancel.length;i++){
-            $(cancel[i]).click();
+/**
+ * 监听选择文件事件
+ * @param {*} e 
+ */
+function selectFile(e) {
+    var f = $('.filess')[0].files[0];
+    var id = 'file_' + uuid();
+    var h = '<div class="div_file_block upload_file_block" id="' + id + '">' +
+        ' <img style="position:absolute;margin:-5px 0px;width:15px;height:15px;" src="/images/delete.png" onclick="$(this).parent().remove();"/>' +
+        ' <p class="file_state">待上传</p>' +
+        ' <img src="/images/unknown_type.png" style="width:72px;height:72px;margin-top:3px;" title="文件" />' +
+        ' <p class="column-elipsis" style="margin-top:-6px;text-align:center;">' + f.name + '</p>' +
+        ' </div>';
+    $('#upload_add').before(h);
+    f.id = id;
+    $('#' + f.id).attr('data-state', 'wait'); // 文件状态
+    AjaxFile(f, 0);
+    $('.filess').val('');
+}
+
+/**
+ * 分片异步上传
+ * @param {*} file 
+ * @param {*} i 
+ */
+function AjaxFile(file, i) {
+    var name = file.name, //文件名
+        size = file.size, //总大小shardSize = 2 * 1024 * 1024, 
+        shardSize = 2 * 1024 * 1024, //以2MB为一个分片
+        shardCount = Math.ceil(size / shardSize); //总片数
+    if (i >= shardCount) {
+        return;
+    }
+    //计算每一片的起始与结束位置
+    var start = i * shardSize,
+        end = Math.min(size, start + shardSize);
+    //构造一个表单，FormData是HTML5新增的
+    var form = new FormData();
+    form.append("data", file.slice(start, end)); //slice方法用于切出文件的一部分
+    form.append("lastModified", file.lastModified);
+    form.append("fileName", name);
+    form.append("total", shardCount); //总片数
+    form.append("index", i + 1); //当前是第几片
+    UploadPath = file.lastModified
+        //Ajax提交文件
+    $.ajax({
+        url: "/Public/UploadSliceFile",
+        type: "POST",
+        data: form,
+        async: true, //异步
+        processData: false, //很重要，告诉jquery不要对form进行处理
+        contentType: false, //很重要，指定为false才能形成正确的Content-Type
+        success: function(result) {
+            if (result != null) {
+                i = result.number++;
+                var num = Math.ceil(i * 100 / shardCount);
+                $('#' + file.id + ' .file_state').html(num + '%');
+                AjaxFile(file, i);
+                if (result.mergeOk) {
+                    $('#' + file.id + ' .file_state').css('color', 'green');
+                    $('#' + file.id + ' .file_state').html('上传成功');
+                    $('#' + file.id).attr('data-fileName', file.name); // 文件名称
+                    $('#' + file.id).attr('data-fileSize', file.size); // 文件大小
+                    $('#' + file.id).attr('data-state', 'success'); // 文件状态
+                    $('#' + file.id).attr('data-fileUrl', result.fileUrl); // 文件路径
+                }
+            }
+        }
+    });
+}
+
+/**
+ * uuid
+ */
+function uuid() {
+    var s = [];
+    var hexDigits = "0123456789abcdef";
+    for (var i = 0; i < 36; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+    }
+    s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+    s[8] = s[13] = s[18] = s[23] = "-";
+
+    var uuid = s.join("");
+    return uuid;
+}
+
+/**
+ * 清空文件列表
+ */
+function cleanUploadFile() {
+    $('.upload_file_block').remove();
+}
+
+/**
+ * 获取文件列表
+ */
+function getFileList() {
+    var files = [];
+    if ($('.upload_file_block') != null) {
+        for (var i = 0; i < $('.upload_file_block').length; i++) {
+            var fileName = $($('.upload_file_block')[i]).attr('data-fileName');
+            var fileSize = $($('.upload_file_block')[i]).attr('data-fileSize');
+            var state = $($('.upload_file_block')[i]).attr('data-state');
+            var fileUrl = $($('.upload_file_block')[i]).attr('data-fileUrl');
+            if (state != null && state == 'success') {
+                files.push({
+                    fileName: fileName != null ? fileName : '', // 文件名称
+                    fileSize: fileSize != null ? fileSize : '', // 文件大小
+                    fileUrl: fileUrl != null ? fileUrl : '' // 文件路径
+                });
+            }
         }
     }
-    if (uploader != null) {
-        uploader.reset();
+    return files;
+}
+
+/**
+ * 设置历史文件列表
+ * @param {*} files 
+ */
+function setHistoryFileList(files) {
+    if (files != null && files.length > 0) {
+        for (var i = 0; i < files.length; i++) {
+            var h = '<div class="div_file_block upload_file_block" data-fileName="' + files[i].fileName + '" data-state="success" data-fileSize="' + files[i].fileSize + '" data-fileUrl="' + files[i].fileUrl + '">' +
+                ' <img style="position:absolute;margin:-5px 0px;width:15px;height:15px;" src="/images/delete.png" onclick="$(this).parent().remove();"/>' +
+                ' <p class="file_state" style="color:green">上传完成</p>' +
+                ' <img src="/images/unknown_type.png" style="width:72px;height:72px;margin-top:3px;" title="文件" />' +
+                ' <p class="column-elipsis" style="margin-top:-6px;text-align:center;">' + files[i].fileName + '</p>' +
+                ' </div>';
+            $('#upload_add').before(h);
+        }
     }
 }
