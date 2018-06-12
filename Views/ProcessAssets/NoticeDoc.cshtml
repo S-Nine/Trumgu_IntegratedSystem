@@ -29,13 +29,31 @@
 			<table id="notice_datagrid" title="公告文档列表"></table> 
 		</div>
 	</div>
-	<div id="dlg_add_notice" class="easyui-dialog" title="编辑公告文件" style="width:700px;height:500px;padding:5px;"   
+	<div id="dlg_add_notice" class="easyui-dialog" title="编辑公告文件" style="width:600px;height:500px;padding:5px;"   
         data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
 		<input type="hidden" id="hid_id" value=""/>
 		<div style="margin-top:5px;">
-			<span>用户名称：</span>
-			<input id="txt_name" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+			<div style="margin-top:5px;">
+				<span>公告标题：</span>
+				<input id="txt_title" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+				<span>是否置顶：</span>
+				<select id="cmb_is_settop" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false">   
+					<option value="0">否</option>   
+					<option value="1">是</option>
+				</select>&nbsp;&nbsp;<span style="color:red;">*</span>
+			</div>
+			<div style="margin-top:5px;">
+				<span>公告备注：</span>
+				<input id="txt_remarks" class="easyui-textbox" data-options="validType:['length[0,200]'],multiline:true" style="width:480px;height:80px;">
+			</div>
 			@Html.Partial("../Shared/_UploadFileControl.cshtml")
+		</div>
+	</div>
+	<div id="dlg_notice_file" class="easyui-dialog" title="附件" style="width:600px;height:500px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<input type="hidden" id="hid_id" value=""/>
+		<div style="margin-top:5px;height:442px;">
+			<table id="file_datagrid" title="附件列表"></table>
 		</div>
 	</div>
 	<script type="text/javascript" src="~/js/processAssets/noticedoc.js?t=@DateTime.Now.ToFileTimeUtc()"></script>

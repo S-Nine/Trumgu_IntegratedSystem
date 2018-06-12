@@ -19,6 +19,28 @@ namespace Trumgu_IntegratedManageSystem.Controllers
         /// <returns></returns>
         public IActionResult Index()
         {
+            t_sys_userObj user = null;
+            List<t_sys_delpartmentObj> del_ary = null;
+            string cDelNames = "";
+            string cUserInfo = HttpContext.Session.GetString("UserInfo");
+            string cDelpartmentInfo = HttpContext.Session.GetString("DelpartmentInfo");
+            if (!string.IsNullOrWhiteSpace(cUserInfo))
+            {
+                user = Newtonsoft.Json.JsonConvert.DeserializeObject<t_sys_userObj>(cUserInfo);
+            }
+            if (!string.IsNullOrWhiteSpace(cDelpartmentInfo))
+            {
+                del_ary = Newtonsoft.Json.JsonConvert.DeserializeObject<List<t_sys_delpartmentObj>>(cDelpartmentInfo);
+                if (del_ary != null && del_ary.Count > 0)
+                {
+                    for (int i = 0; i < del_ary.Count; i++)
+                    {
+                        cDelNames += (i != 0 && i != del_ary.Count - 1) ? "，"+del_ary[i].name : del_ary[i].name;
+                    }
+                }
+            }
+            ViewData["name"] = user != null ? user.name : "";
+            ViewData["departments"] = cDelNames;
             return View();
         }
 

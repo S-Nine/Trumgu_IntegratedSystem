@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 
-namespace Trumgu_IntegratedManageSystem.Models.sys {
+namespace Trumgu_IntegratedManageSystem.Models.sys
+{
 
-    public class t_sys_fileObj {
+    public class t_sys_fileObj
+    {
         private int? _id = null;
         /// <summary>
         /// 主键
@@ -33,34 +36,22 @@ namespace Trumgu_IntegratedManageSystem.Models.sys {
         /// </summary>
         public long? file_size { get { return _file_size; } set { _file_size = value; } }
 
-        private int? _is_delete = null;
+        private DateTime? _upload_time = null;
         /// <summary>
-        /// 是否删除：0->未删除；1->已删除
+        /// 上传时间
         /// </summary>
-        public int? is_delete { get { return _is_delete; } set { _is_delete = value; } }
+        public DateTime? upload_time { get { return _upload_time; } set { _upload_time = value; } }
 
-        private string _last_modify_id = null;
+        private string _belong_modular = null;
         /// <summary>
-        /// 最后修改人主键
+        /// 所属模块
         /// </summary>
-        public string last_modify_id { get { return _last_modify_id; } set { _last_modify_id = value; } }
+        public string belong_modular { get { return _belong_modular; } set { _belong_modular = value; } }
 
-        private string _last_modify_name = null;
+        private string _belong_modular_id = null;
         /// <summary>
-        /// 最后修改人名称
+        /// 所属数据
         /// </summary>
-        public string last_modify_name { get { return _last_modify_name; } set { _last_modify_name = value; } }
-
-        private DateTime? _last_modify_time = null;
-        /// <summary>
-        /// 最后修改日期
-        /// </summary>
-        public DateTime? last_modify_time { get { return _last_modify_time; } set { _last_modify_time = value; } }
-
-        private DateTime? _create_time = null;
-        /// <summary>
-        /// 创建日期
-        /// </summary>
-        public DateTime? create_time { get { return _create_time; } set { _create_time = value; } }
+        public string belong_modular_id { get { return _belong_modular_id; } set { _belong_modular_id = value; } }
     }
 }

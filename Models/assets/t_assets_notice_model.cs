@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Trumgu_IntegratedManageSystem.Models.sys {
 
@@ -66,5 +67,19 @@ namespace Trumgu_IntegratedManageSystem.Models.sys {
         
         public int? page { get; set; }
         public int? rows { get; set; }
+    }
+
+    
+
+    public class t_assets_noticeExObj : t_assets_noticeObj
+    {
+        public List<FileInfoObj> files { get; set; }
+    }
+
+    public class FileInfoObj
+    {
+        public string fileName { get; set; }
+        public long? fileSize { get; set; }
+        public string fileUrl { get; set; }
     }
 }

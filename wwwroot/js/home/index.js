@@ -1,5 +1,8 @@
+var timer = null; // 隐藏设置菜单的timeout事件
 $(document).ready(function() {
     initMenu();
+    $('#btn_setting').hover(showSettingMenu, hideSettingMenu);
+    $('.profile-drop-div').hover(showSettingMenu, hideSettingMenu);
 });
 
 /**
@@ -57,4 +60,34 @@ function onClickMenu2() {
             closable: true,
         });
     }
+}
+
+/**
+ * 显示设置菜单
+ */
+function showSettingMenu() {
+    if (timer != null) {
+        try {
+            clearTimeout(timer);
+        } catch (e) {
+
+        }
+    }
+    $('.profile-drop-div').css('display', 'inline-table');
+}
+
+/**
+ * 隐藏设置菜单
+ */
+function hideSettingMenu() {
+    timer = setTimeout(function() {
+        $('.profile-drop-div').css('display', 'none');
+    }, 200);
+}
+
+/**
+ * 登出
+ */
+function loginout() {
+    window.location.href = "/login/Loginout?t=" + uuid();
 }

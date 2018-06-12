@@ -52,8 +52,8 @@ namespace Trumgu_IntegratedManageSystem
         {
             if (env.IsDevelopment())
             {
-                //app.UseDeveloperExceptionPage();
-                app.UseExceptionHandler("/Error/ErrorJump/{0}");
+                app.UseDeveloperExceptionPage();
+                //app.UseExceptionHandler("/Error/ErrorJump/{0}");
             }
             else
             {
@@ -71,6 +71,10 @@ namespace Trumgu_IntegratedManageSystem
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Login}/{action=Jump}/{id?}");
+            });
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                ServeUnknownFileTypes = true    // 不限制下载文件的content-type
             });
 
             // 初始化配置

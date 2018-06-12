@@ -163,5 +163,12 @@ namespace Trumgu_IntegratedManageSystem.Controllers {
             HttpContext.Response.Redirect("/Login/Index?t=" + DateTime.Now.ToFileTimeUtc() , true);
             return View();   
         }
+
+        public IActionResult Loginout()
+        {
+            HttpContext.Session.Clear();
+            HttpContext.Response.Redirect("/Login/Index?t=" + DateTime.Now.ToFileTimeUtc() , true);
+            return View();
+        }
     }
 }
