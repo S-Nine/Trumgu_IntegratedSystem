@@ -1,9 +1,63 @@
 var timer = null; // 隐藏设置菜单的timeout事件
 $(document).ready(function() {
     initMenu();
+    initEvent();
     $('#btn_setting').hover(showSettingMenu, hideSettingMenu);
     $('.profile-drop-div').hover(showSettingMenu, hideSettingMenu);
 });
+
+function initEvent() {
+    $('#dlg_update_pwd').dialog({
+        toolbar: [{
+            id: 'pwd_save',
+            text: '保存',
+            iconCls: 'icon-save',
+            handler: function() {
+                if (isValidate('dlg_update_pwd')) {
+                    if ($('#pwd_save').linkbutton("options").disabled) { // 防止重复提交数据
+                        return;
+                    }
+                    $('#pwd_save').linkbutton("disable"); // 禁用
+
+                    var params = {
+                        o_pwd: $('#txt_login_o_pwd').passwordbox('getValue'),
+                        n_pwd: $('#txt_login_n_pwd').passwordbox('getValue'),
+                        q_pwd: $('#txt_login_q_pwd').passwordbox('getValue')
+                    };
+
+                    if (params.n_pwd != params.q_pwd) {
+                        $.messager.alert('提示', '确认密码与新密码不一致！');
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '/System/UpdatePWD/',
+                        type: 'post',
+                        dataType: 'json',
+                        data: params,
+                        success: function(data) {
+                            if ($('#pwd_save').linkbutton("options").disabled) { // 防止重复提交数据
+                                $('#pwd_save').linkbutton("enable"); // 启用
+                            }
+                            if (data != null && data.code == 200) {
+                                $('#dlg_update_pwd').dialog('close');
+                                $.messager.alert('提示', '保存成功！');
+                            } else {
+                                $.messager.alert('提示', '保存失败！' + data.data);
+                            }
+                        },
+                        error: function() {
+                            $.messager.alert('错误', '网络连接失败、请稍后再试！');
+                            if ($('#pwd_save').linkbutton("options").disabled) { // 防止重复提交数据
+                                $('#pwd_save').linkbutton("enable"); // 启用
+                            }
+                        }
+                    });
+                }
+            }
+        }]
+    });
+}
 
 /**
  * 初始化菜单
@@ -90,4 +144,11 @@ function hideSettingMenu() {
  */
 function loginout() {
     window.location.href = "/login/Loginout?t=" + uuid();
+}
+
+function showUpdatePwd() {
+    $('#txt_login_o_pwd').passwordbox('clear');
+    $('#txt_login_n_pwd').passwordbox('clear');
+    $('#txt_login_q_pwd').passwordbox('clear');
+    $('#dlg_update_pwd').dialog('open');
 }

@@ -1,4 +1,4 @@
-$(function () {
+$(function() {
     initEvent();
     initDatagrid();
 });
@@ -27,7 +27,7 @@ function initDatagrid() {
                     field: 'gender',
                     title: '用户性别',
                     width: 100,
-                    formatter: function (value, row, index) {
+                    formatter: function(value, row, index) {
                         if (value != null) {
                             if (value == 1) {
                                 return '男';
@@ -43,7 +43,7 @@ function initDatagrid() {
                     field: 'state',
                     title: '用户状态',
                     width: 100,
-                    formatter: function (value, row, index) {
+                    formatter: function(value, row, index) {
                         if (value != null) {
                             if (value == 1) {
                                 return '启用';
@@ -60,7 +60,7 @@ function initDatagrid() {
                     field: 'create_time',
                     title: '创建时间',
                     width: 130,
-                    formatter: function (value, row, index) {
+                    formatter: function(value, row, index) {
                         if (value != null) {
                             return value.replace('T', ' ');
                         } else {
@@ -72,7 +72,7 @@ function initDatagrid() {
                     field: 'last_modify_time',
                     title: '最后修改时间',
                     width: 130,
-                    formatter: function (value, row, index) {
+                    formatter: function(value, row, index) {
                         if (value != null) {
                             return value.replace('T', ' ');
                         } else {
@@ -82,7 +82,7 @@ function initDatagrid() {
                 },
             ]
         ],
-        onBeforeLoad: function (param) {
+        onBeforeLoad: function(param) {
             param.name_like = $('#txt_name_like').textbox('getValue') != null ? $('#txt_name_like').textbox('getValue') : ''
         },
         view: DataGridNoDataView,
@@ -98,8 +98,8 @@ function initEvent() {
         toolbar: [{
             id: 'user_save',
             text: '保存',
-            iconCls: 'icon-add',
-            handler: function () {
+            iconCls: 'icon-save',
+            handler: function() {
                 if (isValidate('dlg_add_user')) {
                     if ($('#user_save').linkbutton("options").disabled) { // 防止重复提交数据
                         return;
@@ -121,7 +121,7 @@ function initEvent() {
                         type: 'post',
                         dataType: 'json',
                         data: params,
-                        success: function (data) {
+                        success: function(data) {
                             if ($('#user_save').linkbutton("options").disabled) { // 防止重复提交数据
                                 $('#user_save').linkbutton("enable"); // 启用
                             }
@@ -133,7 +133,7 @@ function initEvent() {
                                 $.messager.alert('提示', '保存失败！' + data.data);
                             }
                         },
-                        error: function () {
+                        error: function() {
                             $.messager.alert('错误', '网络连接失败、请稍后再试！');
                             if ($('#user_save').linkbutton("options").disabled) { // 防止重复提交数据
                                 $('#user_save').linkbutton("enable"); // 启用
@@ -149,7 +149,7 @@ function initEvent() {
         toolbar: [{
             id: 'delp_save',
             text: '保存',
-            iconCls: 'icon-add',
+            iconCls: 'icon-save',
             handler: function() {
                 if (isValidate('dlg_add_delp')) {
                     if ($('#delp_save').linkbutton("options").disabled) { // 防止重复提交数据
@@ -208,7 +208,7 @@ function initEvent() {
         toolbar: [{
             id: 'role_save',
             text: '保存',
-            iconCls: 'icon-add',
+            iconCls: 'icon-save',
             handler: function() {
                 if (isValidate('dlg_add_role')) {
                     if ($('#role_save').linkbutton("options").disabled) { // 防止重复提交数据
@@ -278,16 +278,16 @@ function initEvent() {
  * 初始化按钮事件(_ButtonTools.cshtml会自动加载)
  */
 function initButtonEvent() {
-    $('#btn_search') != null && $('#btn_search').click(function () {
+    $('#btn_search') != null && $('#btn_search').click(function() {
         $('#user_datagrid').datagrid('reload');
     });
 
-    $('#btn_add') != null && $('#btn_add').click(function () {
+    $('#btn_add') != null && $('#btn_add').click(function() {
         cleanAddUserDialog();
         $('#dlg_add_user').dialog('open');
     });
 
-    $('#btn_edit') != null && $('#btn_edit').click(function () {
+    $('#btn_edit') != null && $('#btn_edit').click(function() {
         var rows = $('#user_datagrid').datagrid('getSelections');
         if (rows != null && rows.length == 1) {
             cleanAddUserDialog();
@@ -336,7 +336,7 @@ function initButtonEvent() {
         }
     });
 
-    $('#btn_delpment') != null && $('#btn_delpment').click(function(){
+    $('#btn_delpment') != null && $('#btn_delpment').click(function() {
         var rows = $('#user_datagrid').datagrid('getSelections');
         if (rows != null && rows.length == 1) {
             if ($('#delp_save').linkbutton("options").disabled) {
@@ -362,7 +362,7 @@ function initButtonEvent() {
         }
     });
 
-    $('#btn_role') != null && $('#btn_role').click(function(){
+    $('#btn_role') != null && $('#btn_role').click(function() {
         var rows = $('#user_datagrid').datagrid('getSelections');
         if (rows != null && rows.length == 1) {
             if ($('#role_save').linkbutton("options").disabled) {

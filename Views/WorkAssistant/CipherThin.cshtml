@@ -1,0 +1,74 @@
+@using Trumgu_IntegratedManageSystem.Utils
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html >
+<head>
+	<meta charset="UTF-8">
+	<title>密码薄</title>
+	<link rel="stylesheet" type="text/css" href="~/css/layout.css">
+	<link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/icon.css">
+	<script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.min.js"></script>
+	<script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/locale/easyui-lang-zh_CN.js"></script>
+	<script type="text/javascript" src="~/js/utils/tools.js"></script>
+	<script type="text/javascript" src="~/js/utils/config.js"></script>
+	<script type="text/javascript" src="~/js/utils/easyui-extend.js"></script>
+</head>
+<body style="height:100%;overflow:hidden;">
+	<div class="content" style="padding: 78px 0 0;">
+		<div class="operation_area" style="height:78px;">
+			<div class="easyui-panel" style="padding:5px;height:38px;width:100%;">
+				标题名称：<input id="txt_title_like" class="easyui-textbox" style="width:150px">
+				&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;">注：账号&密码采用加密存储，信不信自己决定!</span>
+			</div>
+			@Html.Partial("../Shared/_ButtonTools.cshtml")
+		</div>
+		<div class="datagrid_area" style="width:100%;">
+			<table id="cipher_treegrid" title="密码列表"></table> 
+		</div>
+	</div>
+	<div id="dlg_add_cipher" class="easyui-dialog" title="编辑密码薄" style="width:350px;height:350px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<input type="hidden" id="hid_id" value=""/>
+		<div style="margin-top:5px;">
+			<span>密保标题：</span>
+			<input id="txt_title" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>密保账号：</span>
+			<input id="txt_account_number" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>密保密码：</span>
+			<input id="txt_account_pwd" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>密保网址：</span>
+			<input id="txt_account_url" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:200px">
+		</div>
+		<div style="margin-top:5px;">
+			<span>密保邮箱：</span>
+			<input id="txt_account_email" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:200px">
+		</div>
+		<div style="margin-top:5px;">
+			<span>密保电话：</span>
+			<input id="txt_account_tel" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:200px">
+		</div>
+		<div style="margin-top:5px;">
+			<span>注册日期：</span>
+			<input id="txt_account_register_date" class="easyui-datebox" data-options="editable:false" style="width:200px">
+		</div>
+		<div class="qa" style="margin-top:5px;">
+			<span>Q：</span>
+			<input class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:100px">&nbsp;&nbsp;&nbsp;
+			<span>A：</span>
+			<input class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:100px">
+			<a href="#" onclick="addQA();" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true"></a> 
+		</div>
+	</div>
+	<script type="text/javascript" src="~/js/workAssistant/cipherThin.js?t=@DateTime.Now.ToFileTimeUtc()"></script>
+</body>
+</html>

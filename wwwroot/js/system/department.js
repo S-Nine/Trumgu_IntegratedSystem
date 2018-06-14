@@ -8,7 +8,7 @@ function initEvent() {
         toolbar: [{
             id: 'depart_save',
             text: '保存',
-            iconCls: 'icon-add',
+            iconCls: 'icon-save',
             handler: function() {
                 if (isValidate('dlg_add_depart')) {
                     if ($('#depart_save').linkbutton("options").disabled) { // 防止重复提交数据

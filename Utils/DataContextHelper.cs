@@ -92,5 +92,15 @@ namespace Trumgu_IntegratedManageSystem.Utils
         public DbSet<t_xfund_user_call_logObj> t_xfund_user_call_log { get; set; }
 
         public DbSet<OperationStatisticsObj> OperationStatistics { get; set; }
+
+        /// <summary>
+        /// 密码薄
+        /// </summary>
+        public DbSet<t_assets_cipher_thinObj> t_assets_cipher_thin { get; set; }
+
+        /// <summary>
+        /// 密码薄密保表
+        /// </summary>
+        public DbSet<t_assets_cipher_thin_serurityObj> t_assets_cipher_thin_serurity { get; set; }
     }
 }

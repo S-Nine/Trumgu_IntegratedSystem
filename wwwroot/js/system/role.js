@@ -97,7 +97,7 @@ function initEvent() {
         toolbar: [{
             id: 'role_save',
             text: '保存',
-            iconCls: 'icon-add',
+            iconCls: 'icon-save',
             handler: function() {
                 if (isValidate('dlg_add_role')) {
                     if ($('#role_save').linkbutton("options").disabled) { // 防止重复提交数据
@@ -145,7 +145,7 @@ function initEvent() {
         toolbar: [{
             id: 'right_save',
             text: '保存',
-            iconCls: 'icon-add',
+            iconCls: 'icon-save',
             handler: function() {
                 if (isValidate('dlg_add_right')) {
                     if ($('#right_save').linkbutton("options").disabled) { // 防止重复提交数据

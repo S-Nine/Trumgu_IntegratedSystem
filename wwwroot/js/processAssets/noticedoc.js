@@ -164,7 +164,7 @@ function initEvent() {
         toolbar: [{
             id: 'notice_save',
             text: '保存',
-            iconCls: 'icon-add',
+            iconCls: 'icon-save',
             handler: function() {
                 if (isValidate('dlg_add_role')) {
                     if ($('#notice_save').linkbutton("options").disabled) { // 防止重复提交数据

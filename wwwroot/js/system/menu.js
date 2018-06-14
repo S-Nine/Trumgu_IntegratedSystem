@@ -144,7 +144,7 @@ function initEvent() {
         toolbar: [{
             id: 'menu_save',
             text: '保存',
-            iconCls: 'icon-add',
+            iconCls: 'icon-save',
             handler: function() {
                 if (isValidate('dlg_add_menu')) {
                     if ($('#menu_save').linkbutton("options").disabled) { // 防止重复提交数据
@@ -198,7 +198,7 @@ function initEvent() {
         toolbar: [{
             id: 'button_save',
             text: '保存',
-            iconCls: 'icon-add',
+            iconCls: 'icon-save',
             handler: function() {
                 if (isValidate('dlg_add_button')) {
                     if ($('#button_save').linkbutton("options").disabled) { // 防止重复提交数据
