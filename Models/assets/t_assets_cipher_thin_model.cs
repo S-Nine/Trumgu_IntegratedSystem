@@ -60,6 +60,12 @@ namespace Trumgu_IntegratedManageSystem.Models.sys
         /// </summary>
         public DateTime? account_register_date { get { return _account_register_date; } set { _account_register_date = value; } }
 
+        private string _remarks = null;
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string remarks { get { return _remarks; } set { _remarks = value; } }
+
         private int? _is_delete = null;
         /// <summary>
         /// 是否删除：0->未删除；1->已删除
@@ -97,8 +103,13 @@ namespace Trumgu_IntegratedManageSystem.Models.sys
         /// 标题模糊查询
         /// </summary>
         public string title_like { get; set; }
-        
+
         public int? page { get; set; }
         public int? rows { get; set; }
+    }
+
+    public class t_assets_cipher_thinExObj : t_assets_cipher_thinObj
+    {
+        public List<t_assets_cipher_thin_serurityObj> qa { get; set; }
     }
 }

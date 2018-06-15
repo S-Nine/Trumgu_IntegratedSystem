@@ -27,10 +27,10 @@
 			@Html.Partial("../Shared/_ButtonTools.cshtml")
 		</div>
 		<div class="datagrid_area" style="width:100%;">
-			<table id="cipher_treegrid" title="密码列表"></table> 
+			<table id="cipher_dategrid" title="密码列表"></table> 
 		</div>
 	</div>
-	<div id="dlg_add_cipher" class="easyui-dialog" title="编辑密码薄" style="width:350px;height:350px;padding:5px;"   
+	<div id="dlg_add_cipher" class="easyui-dialog" title="编辑密码薄" style="width:350px;height:400px;padding:5px;"   
         data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
 		<input type="hidden" id="hid_id" value=""/>
 		<div style="margin-top:5px;">
@@ -61,12 +61,23 @@
 			<span>注册日期：</span>
 			<input id="txt_account_register_date" class="easyui-datebox" data-options="editable:false" style="width:200px">
 		</div>
+		<div style="margin-top:5px;">
+			<span>密保备注：</span>
+			<input id="txt_remarks" class="easyui-textbox" data-options="validType:['length[0,200]'],multiline:true" style="width:200px;height:80px;">
+		</div>
 		<div class="qa" style="margin-top:5px;">
 			<span>Q：</span>
-			<input class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:100px">&nbsp;&nbsp;&nbsp;
+			<input class="q easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:100px">&nbsp;&nbsp;&nbsp;
 			<span>A：</span>
-			<input class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:100px">
+			<input class="a easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:100px">
 			<a href="#" onclick="addQA();" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true"></a> 
+		</div>
+	</div>
+	<div id="dlg_qa" class="easyui-dialog" title="附件" style="width:600px;height:500px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<input type="hidden" id="hid_id" value=""/>
+		<div style="margin-top:5px;height:442px;">
+			<table id="qa_datagrid" title="Q&A"></table>
 		</div>
 	</div>
 	<script type="text/javascript" src="~/js/workAssistant/cipherThin.js?t=@DateTime.Now.ToFileTimeUtc()"></script>
