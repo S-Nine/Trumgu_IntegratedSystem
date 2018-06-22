@@ -19,14 +19,19 @@ namespace Trumgu_IntegratedManageSystem.Utils
         /// </summary>
         public static string trumgu_bi_db_connstr { get; set; }
 
-                /// <summary>
-        /// 技术支持
+        /// <summary>
+        /// fund库
         /// </summary>
-        public static string ProgramName{get;set;}
+        public static string fund_connstr{get;set;}
 
         /// <summary>
         /// 技术支持
         /// </summary>
-        public static string TechnicalSupport{get;set;}
+        public static string ProgramName { get; set; }
+
+        /// <summary>
+        /// 技术支持
+        /// </summary>
+        public static string TechnicalSupport { get; set; }
     }
 }

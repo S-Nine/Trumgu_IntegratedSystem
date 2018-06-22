@@ -85,6 +85,7 @@ namespace Trumgu_IntegratedManageSystem
                  .Build();
             ConfigConstantHelper.trumgu_ims_db_connstr = config["ConnectionStr:trumgu_ims_db"];
             ConfigConstantHelper.trumgu_bi_db_connstr = config["ConnectionStr:trumgu_bi_db"];
+            ConfigConstantHelper.fund_connstr = config["ConnectionStr:fund"];
             ConfigConstantHelper.ProgramName = config["ProgramStr:ProgramName"];
             ConfigConstantHelper.TechnicalSupport = config["ProgramStr:TechnicalSupport"];
         }

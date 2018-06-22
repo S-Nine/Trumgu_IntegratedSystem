@@ -102,5 +102,15 @@ namespace Trumgu_IntegratedManageSystem.Utils
         /// 密码薄密保表
         /// </summary>
         public DbSet<t_assets_cipher_thin_serurityObj> t_assets_cipher_thin_serurity { get; set; }
+
+        /// <summary>
+        /// XFund（机构版）用户表
+        /// </summary>
+        public DbSet<xfund_t_sys_userExObj> xfund_t_sys_user { get; set; }
+
+        /// <summary>
+        /// XFund（私募版）用户表
+        /// </summary>
+        public DbSet<xfund_t_pf_sys_userExObj> xfund_t_pf_sys_user { get; set; }
     }
 }
