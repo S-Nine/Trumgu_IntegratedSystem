@@ -32,7 +32,7 @@
 			<table id="user_datagrid" title="用户列表"></table> 
 		</div>
 	</div>
-	<div id="dlg_add_user" class="easyui-dialog" title="编辑用户" style="width:380px;height:280px;padding:5px;"   
+	<div id="dlg_add_user" class="easyui-dialog" title="编辑用户" style="width:400px;height:480px;padding:5px;"   
         data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
 		<input type="hidden" id="hid_id" value=""/>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
@@ -49,27 +49,30 @@
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>公司名称：</span>
-			<input id="txt_company_name" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+			<input id="cmb_company_name" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]'],mode:'remote',url:'/PFXFundOrganization/GetVaguePrivateCompanyName'" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>联系电话：</span>
-			<input id="txt_telephone" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+			<input id="txt_telephone" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;&nbsp;&nbsp
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>联系邮箱：</span>
-			<input id="txt_mailbox" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]','email']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+			<input id="txt_mailbox" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]','email']" style="width:200px">&nbsp;&nbsp;&nbsp;&nbsp
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>所属部门：</span>
-			<input id="txt_department" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+			<input id="txt_department" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;&nbsp;&nbsp;
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>到期日期：</span>
-			<input id="date_datebox" class="easyui-textbox easyui-validatebox" data-options="required:true" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+			<input id="date_expiretime" class="easyui-datebox" data-options="required:true,editable:false" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>负&nbsp;责&nbsp;人：</span>
-			<input id="txt_person_liable" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+			<select id="cmb_person_liable" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false">   
+				<option value="0">否</option>   
+				<option value="1">是</option>
+			</select>&nbsp;&nbsp;<span style="color:red;">*</span>
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>是否为负责人：</span>

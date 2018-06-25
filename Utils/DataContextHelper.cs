@@ -5,14 +5,11 @@ using Trumgu_IntegratedManageSystem.Models;
 using Trumgu_IntegratedManageSystem.Models.sys;
 using Trumgu_IntegratedManageSystem.Models.xfund;
 
-namespace Trumgu_IntegratedManageSystem.Utils
-{
-    public class DataContextHelper : DbContext
-    {
-        public DataContextHelper(DbContextOptions<DataContextHelper> options) : base(options) { }
+namespace Trumgu_IntegratedManageSystem.Utils {
+    public class DataContextHelper : DbContext {
+        public DataContextHelper (DbContextOptions<DataContextHelper> options) : base (options) { }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
+        protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder) {
             // optionsBuilder.UseMySQL(@"server=127.0.0.1;port=3306;database=trumgu_ims_db;uid=root;pwd=Cy616620664.;charset='utf8';SslMode=None;");
         }
 
@@ -112,5 +109,10 @@ namespace Trumgu_IntegratedManageSystem.Utils
         /// XFund（私募版）用户表
         /// </summary>
         public DbSet<xfund_t_pf_sys_userExObj> xfund_t_pf_sys_user { get; set; }
+
+        /// <summary>
+        /// XFund系统配置表
+        /// </summary>]
+        public DbSet<xfund_t_sys_dictionariesObj> xfund_t_sys_dictionaries { get; set; }
     }
 }
