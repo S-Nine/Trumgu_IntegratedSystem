@@ -88,6 +88,7 @@ namespace Trumgu_IntegratedManageSystem
             ConfigConstantHelper.fund_connstr = config["ConnectionStr:fund"];
             ConfigConstantHelper.ProgramName = config["ProgramStr:ProgramName"];
             ConfigConstantHelper.TechnicalSupport = config["ProgramStr:TechnicalSupport"];
+            ConfigConstantHelper.XFundUploadFileRootPath = config["SystemConfig:XFundUploadFileRootPath"];
         }
     }
 }

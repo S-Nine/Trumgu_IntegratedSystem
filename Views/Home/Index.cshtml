@@ -1,180 +1,189 @@
-﻿@using Trumgu_IntegratedManageSystem.Utils
-@using Trumgu_IntegratedManageSystem.Models.sys
-@{
-    Layout = null;
-}
+﻿@using Trumgu_IntegratedManageSystem.Utils @using Trumgu_IntegratedManageSystem.Models.sys @{ Layout = null; }
 <!DOCTYPE html>
 <html>
+
 <head>
-	<meta charset="UTF-8">
-	<title>@ConfigConstantHelper.ProgramName</title>
-	<link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/default/easyui.css">
-	<link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/icon.css">
-	<script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.min.js"></script>
-	<script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.easyui.min.js"></script>
-	<script type="text/javascript" src="~/js/utils/tools.js"></script>
-	<style>
-		html,body{
-			height:100%;
-			padding:0px;
-			margin:0px;
-		}
+    <meta charset="UTF-8">
+    <title>@ConfigConstantHelper.ProgramName</title>
+    <link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/icon.css">
+    <script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.min.js"></script>
+    <script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="~/js/utils/tools.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            padding: 0px;
+            margin: 0px;
+        }
 
-		.menu_2{
-			margin: 5px;
-			height: 24px;
-			line-height:24px;
-			font-size: 12px;
-			padding-left: 16px;
-			cursor: pointer;
-			/*background: #E0ECFF;*/
-		}
+        .menu_2 {
+            margin: 5px;
+            height: 24px;
+            line-height: 24px;
+            font-size: 12px;
+            padding-left: 16px;
+            cursor: pointer;
+            /*background: #E0ECFF;*/
+        }
 
-		.select_menu{
-			background: #E0ECFF;
-		}
+        .select_menu {
+            background: #E0ECFF;
+        }
 
-		.no_menu{
-			text-align: center;
-    		margin-top: 10px;
-		}
+        .no_menu {
+            text-align: center;
+            margin-top: 10px;
+        }
 
-		.top_tools{
-			margin-top: 8px;
-			float: right;
-			margin-right: 8px;
-			vertical-align:middle;
-		}
+        .top_tools {
+            margin-top: 8px;
+            float: right;
+            margin-right: 8px;
+            vertical-align: middle;
+            color: #FFF;
+        }
 
-		.top_tools img{
-			vertical-align: middle;
-		}
+        .top_tools img {
+            vertical-align: middle;
+        }
 
-		.top_tools span{
-			height: 100%;
-			vertical-align: middle;
-			display: inline-block;
-			font-size: 15px;
-			margin-left: 5px;
-			margin-right: 20px;
-			max-width: 150px;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			word-break: keep-all;
-			cursor:pointer;
-		}
+        .top_tools span {
+            height: 100%;
+            vertical-align: middle;
+            display: inline-block;
+            font-size: 15px;
+            margin-left: 5px;
+            margin-right: 20px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-break: keep-all;
+            cursor: pointer;
+        }
 
-		.profile-drop-div{
-			bottom: 5px;
-			display: none;
-			min-width: 150px;
-			max-width: 500px;
-			opacity: .95;
-			border: 1px solid #3f4a60;
-			border-radius: 3px;
-			background: #3f4a60;
-			z-index: 102;
-			display: inline-table;
-			position: fixed;
-			float:right;
-			right: 10px;
-			top:35px;
-			display: none;
-		}
-		
-		profile-drop-div .profile-drop-menu ul{
-			list-style: none;
-		}
+        .profile-drop-div {
+            bottom: 5px;
+            display: none;
+            min-width: 150px;
+            max-width: 500px;
+            opacity: .95;
+            border: 1px solid #3f4a60;
+            border-radius: 3px;
+            background: #3f4a60;
+            z-index: 102;
+            display: inline-table;
+            position: fixed;
+            float: right;
+            right: 10px;
+            top: 35px;
+            display: none;
+        }
 
-		.profile-drop-div .profile-drop-menu li{
-			line-height: 38px;
-			position: relative;
-			height: 38px;
-			list-style-type:none;  
-		}
+        profile-drop-div .profile-drop-menu ul {
+            list-style: none;
+        }
 
-		.profile-drop-div .profile-drop-menu li i {
-			display: inline-block;
-			float: left;
-			width: 14px;
-			height: 14px;
-			margin: 11px 10px 0 0;
-		}
+        .profile-drop-div .profile-drop-menu li {
+            line-height: 38px;
+            position: relative;
+            height: 38px;
+            list-style-type: none;
+        }
 
-		.profile-drop-div .profile-drop-menu li a {
-			color:#FFF;
-			font-size:14px;
-			text-decoration : none;
-		}
+        .profile-drop-div .profile-drop-menu li i {
+            display: inline-block;
+            float: left;
+            width: 14px;
+            height: 14px;
+            margin: 11px 10px 0 0;
+        }
 
-		.p-infoset{
-			background: url(/images/setting_list.png) no-repeat scroll 0px -32px;
-		}
+        .profile-drop-div .profile-drop-menu li a {
+            color: #FFF;
+            font-size: 14px;
+            text-decoration: none;
+        }
 
-		.p-loginout{
-			background: url(/images/setting_list.png) no-repeat scroll 0px -64px;
-		}
-		.p-password{
-			background: url(/images/setting_list.png) no-repeat scroll 0px -170px;
-		}
-	</style>
+        .p-infoset {
+            background: url(/images/setting_list.png) no-repeat scroll 0px -32px;
+        }
+
+        .p-loginout {
+            background: url(/images/setting_list.png) no-repeat scroll 0px -64px;
+        }
+
+        .p-password {
+            background: url(/images/setting_list.png) no-repeat scroll 0px -170px;
+        }
+
+        .bg {
+            background: url(/images/bj.png);
+            filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale')";
+            -moz-background-size: 100% 100%;
+            background-size: 100% 100%;
+            background-attachment: inherit;
+        }
+    </style>
 </head>
+
 <body>
-	<div class="easyui-layout" style="width:100%;height:100%;">
-		<div data-options="region:'north'" style="height:40px">
-			<div class="top_tools">
-				<img src="~/images/user.png"/><span title="@ViewData["name"]">@ViewData["name"]</span>
-				<img src="~/images/company.png"/><span title="@ViewData["departments"]">@ViewData["departments"]</span>
-				<img src="~/images/setting.png"/><span id="btn_setting">设置</span>
-			</div>
-			<div class="profile-drop-div"> 
-				<ul class="profile-drop-menu"> 
-					<li title="个人设置">
-						<a href="javascript:;"><i class="p-infoset"></i>个人设置</a>
-					</li>
-					<li title="修改密码" onclick="showUpdatePwd();">
-						<a href="javascript:;"><i class="p-password"></i>修改密码</a>
-					</li>
-					<li title="退出登录" onclick="loginout();">
-						<a href="javascript:;"><i class="loginout p-loginout"></i>退出登录</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-		<div data-options="region:'south',split:false" style="height:25px;text-align:center;overflow:hidden;">
-			<p style="margin-top:3px;">@ConfigConstantHelper.TechnicalSupport</p>
-		</div>
-		<!-- <div data-options="region:'east',split:true" title="East" style="width:100px;"></div> -->
-		<div data-options="region:'west',split:true" title="菜单" style="width:200px;">
-			<div id="navigation" class="easyui-accordion" data-options="fit:true,border:false">
-			</div>
-		</div>
-		<div data-options="region:'center',title:'',iconCls:'icon-ok'">
-			<div id="tab_content" class="easyui-tabs" data-options="" style="width:100%;height:100%;">
-				<div title="欢迎" style="padding:0px" data-options="iconCls:'icon-menu-2'">
-					<div style="width:100%;height:100%;overflow:hidden;">
-						<iframe style="width:100%;height:100%;border:0px;" src="/Home/Welcome?t=@DateTime.Now.ToFileTimeUtc()"></iframe>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="dlg_update_pwd" class="easyui-dialog" title="修改密码" style="width:310px;height:180px;padding:5px;"   
-        data-options="iconCls:'icon-edit',resizable:true,modal:true,closed:true">  
-		<div style="margin-top:5px;">
-			<span>原始密码：</span>
-			<input id="txt_login_o_pwd" class="easyui-passwordbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
-		</div>
-		<div style="margin-top:5px;">
-			<span>新的密码：</span>
-			<input id="txt_login_n_pwd" class="easyui-passwordbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
-		</div>
-		<div style="margin-top:5px;">
-			<span>确认密码：</span>
-			<input id="txt_login_q_pwd" class="easyui-passwordbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
-		</div>
-	</div>
-	<script type="text/javascript" src="~/js/home/index.js?t=@DateTime.Now.ToFileTimeUtc()"></script>
+    <div class="easyui-layout" style="width:100%;height:100%;">
+        <div data-options="region:'north'" class="bg" style="height:40px;">
+            <div class="top_tools">
+                <img src="~/images/user.png" /><span title="@ViewData[" name "]">@ViewData["name"]</span>
+                <img src="~/images/company.png" /><span title="@ViewData[" departments "]">@ViewData["departments"]</span>
+                <img src="~/images/setting.png" /><span id="btn_setting">设置</span>
+            </div>
+            <div class="profile-drop-div">
+                <ul class="profile-drop-menu">
+                    <li title="个人设置">
+                        <a href="javascript:;"><i class="p-infoset"></i>个人设置</a>
+                    </li>
+                    <li title="修改密码" onclick="showUpdatePwd();">
+                        <a href="javascript:;"><i class="p-password"></i>修改密码</a>
+                    </li>
+                    <li title="退出登录" onclick="loginout();">
+                        <a href="javascript:;"><i class="loginout p-loginout"></i>退出登录</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div data-options="region:'south',split:false" style="height:25px;text-align:center;overflow:hidden;">
+            <p style="margin-top:3px;">@ConfigConstantHelper.TechnicalSupport</p>
+        </div>
+        <!-- <div data-options="region:'east',split:true" title="East" style="width:100px;"></div> -->
+        <div data-options="region:'west',split:true" title="菜单" style="width:200px;">
+            <div id="navigation" class="easyui-accordion" data-options="fit:true,border:false">
+            </div>
+        </div>
+        <div data-options="region:'center',title:'',iconCls:'icon-ok'">
+            <div id="tab_content" class="easyui-tabs" data-options="" style="width:100%;height:100%;">
+                <div title="欢迎" style="padding:0px" data-options="iconCls:'icon-menu-2'">
+                    <div style="width:100%;height:100%;overflow:hidden;">
+                        <iframe style="width:100%;height:100%;border:0px;" src="/Home/Welcome?t=@DateTime.Now.ToFileTimeUtc()"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="dlg_update_pwd" class="easyui-dialog" title="修改密码" style="width:310px;height:180px;padding:5px;" data-options="iconCls:'icon-edit',resizable:true,modal:true,closed:true">
+        <div style="margin-top:5px;">
+            <span>原始密码：</span>
+            <input id="txt_login_o_pwd" class="easyui-passwordbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+        </div>
+        <div style="margin-top:5px;">
+            <span>新的密码：</span>
+            <input id="txt_login_n_pwd" class="easyui-passwordbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+        </div>
+        <div style="margin-top:5px;">
+            <span>确认密码：</span>
+            <input id="txt_login_q_pwd" class="easyui-passwordbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+        </div>
+    </div>
+    <script type="text/javascript" src="~/js/home/index.js?t=@DateTime.Now.ToFileTimeUtc()"></script>
 </body>
+
 </html>

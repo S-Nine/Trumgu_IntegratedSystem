@@ -666,7 +666,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
 
             if (list != null && list.Count > 0)
             {
-                List<MenuTreeDataObj> root = list.Where(rec => rec.parent_id == 0 && rec.type == "menu").OrderBy(rec => rec.sort).ToList();
+                List<MenuTreeDataObj> root = list.Where(rec => rec.parent_id == "0" && rec.type == "menu").OrderBy(rec => rec.sort).ToList();
                 if (root != null && root.Count > 0)
                 {
                     for (int i = 0; i < root.Count; i++)
@@ -679,7 +679,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                         r.iconCls = root[i].iconCls;
                         r.attributes = root[i].parent_id.ToString();
                         r.key = root[i].key;
-                        r.children = list.Where(rec => rec.parent_id == root[i].key).Select(rec => new TreeDataObj() // 二级菜单及一级按钮
+                        r.children = list.Where(rec => rec.parent_id == root[i].key.ToString()).Select(rec => new TreeDataObj() // 二级菜单及一级按钮
                         {
                             id = rec.type + "_" + rec.key,
                             text = rec.text,
@@ -694,7 +694,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                         {
                             for (int j = 0; j < r.children.Count; j++)
                             {
-                                r.children[j].children = list.Where(rec => rec.parent_id == r.children[j].key).Select(rec => new TreeDataObj() // 二级菜单及一级按钮
+                                r.children[j].children = list.Where(rec => rec.parent_id == r.children[j].key.ToString()).Select(rec => new TreeDataObj() // 二级菜单及一级按钮
                                 {
                                     id = rec.type + "_" + rec.key,
                                     text = rec.text,
@@ -724,51 +724,58 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             DateTime dtNow = DateTime.Now;
             t_sys_userObj user = null;
             ResultObj ro = new ResultObj() { code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL, msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString() };
-
-            string cUserInfo = HttpContext.Session.GetString("UserInfo");
-            if (!string.IsNullOrWhiteSpace(cUserInfo))
+            try
             {
-                user = Newtonsoft.Json.JsonConvert.DeserializeObject<t_sys_userObj>(cUserInfo);
-            }
 
-            Utils.DataContextHelper db = Utils.DBHelper.CreateContext();
-            List<t_sys_relation_role_menu_buttonObj> list_del_rel = db.t_sys_relation_role_menu_button.Where(rec => rec.is_delete == 0 && rec.role_id == role_id).ToList();
-
-            if (list_del_rel != null && list_del_rel.Count > 0)
-            {
-                for (int i = 0; i < list_del_rel.Count; i++)
+                string cUserInfo = HttpContext.Session.GetString("UserInfo");
+                if (!string.IsNullOrWhiteSpace(cUserInfo))
                 {
-                    list_del_rel[i].is_delete = 1;
-                    list_del_rel[i].last_modify_id = user.id.ToString();
-                    list_del_rel[i].last_modify_name = user.name;
-                    list_del_rel[i].last_modify_time = dtNow;
+                    user = Newtonsoft.Json.JsonConvert.DeserializeObject<t_sys_userObj>(cUserInfo);
                 }
-                db.t_sys_relation_role_menu_button.UpdateRange(list_del_rel);
-            }
-            if (list != null && list.Count > 0)
-            {
-                for (int i = 0; i < list.Count; i++)
-                {
-                    list[i].is_delete = 0;
-                    list[i].last_modify_id = user.id.ToString();
-                    list[i].last_modify_name = user.name;
-                    list[i].last_modify_time = dtNow;
-                    list[i].create_time = dtNow;
-                }
-                db.t_sys_relation_role_menu_button.AddRange(list);
-            }
 
-            if (db.SaveChanges() > 0)
-            {
-                ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
-                ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                Utils.DataContextHelper db = Utils.DBHelper.CreateContext();
+                List<t_sys_relation_role_menu_buttonObj> list_del_rel = db.t_sys_relation_role_menu_button.Where(rec => rec.is_delete == 0 && rec.role_id == role_id).ToList();
+
+                if (list_del_rel != null && list_del_rel.Count > 0)
+                {
+                    for (int i = 0; i < list_del_rel.Count; i++)
+                    {
+                        list_del_rel[i].is_delete = 1;
+                        list_del_rel[i].last_modify_id = user.id.ToString();
+                        list_del_rel[i].last_modify_name = user.name;
+                        list_del_rel[i].last_modify_time = dtNow;
+                    }
+                    db.t_sys_relation_role_menu_button.UpdateRange(list_del_rel);
+                }
+                if (list != null && list.Count > 0)
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        list[i].is_delete = 0;
+                        list[i].last_modify_id = user.id.ToString();
+                        list[i].last_modify_name = user.name;
+                        list[i].last_modify_time = dtNow;
+                        list[i].create_time = dtNow;
+                    }
+                    db.t_sys_relation_role_menu_button.AddRange(list);
+                }
+
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+                db.Dispose();
             }
-            else
+            catch (Exception ex)
             {
-                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
-                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                ro.msg = ex.Message;
             }
-            db.Dispose();
             return Json(ro);
         }
 

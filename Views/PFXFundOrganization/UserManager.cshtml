@@ -25,6 +25,12 @@
                 登录账号：<input id="txt_userid_like" class="easyui-textbox" style="width:150px">&nbsp;&nbsp;
 				公司名称：<input id="txt_company_name_like" class="easyui-textbox" style="width:150px">&nbsp;&nbsp;
 				负&nbsp;责&nbsp;人：<input id="txt_person_liable_like" class="easyui-textbox" style="width:150px">&nbsp;&nbsp;
+				正式用户：
+				<select id="cmb_is_pay" class="easyui-combobox" name="dept" style="width:80px;" data-options="editable:false">   
+					<option value="-1">全部</option>	
+					<option value="1">是</option>
+					<option value="0">否</option>   
+				</select>
 			</div>
 			@Html.Partial("../Shared/_ButtonTools.cshtml")
 		</div>
@@ -32,9 +38,14 @@
 			<table id="user_datagrid" title="用户列表"></table> 
 		</div>
 	</div>
-	<div id="dlg_add_user" class="easyui-dialog" title="编辑用户" style="width:400px;height:480px;padding:5px;"   
+	<div id="dlg_add_user" class="easyui-dialog" title="编辑用户" style="width:400px;height:495px;padding:5px;"   
         data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
 		<input type="hidden" id="hid_id" value=""/>
+		<div style="margin-top:5px;text-align:right;padding-right:10px;">
+			<input type="hidden" id="hid_parents_id" value=""/>
+			<span>父级账号：</span>
+			<input id="txt_parents_name" class="easyui-textbox easyui-validatebox" data-options="disabled:true" style="width:200px">&nbsp;&nbsp;&nbsp;&nbsp;
+		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span style="width:100px;">用户名称：</span>
 			<input id="txt_name" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
@@ -43,21 +54,21 @@
 			<span>用户账号：</span>
 			<input id="txt_userid" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
 		</div>
-		<div style="margin-top:5px;text-align:right;padding-right:10px;">
+		<div style="margin-top:5px;text-align:right;padding-right:10px;" class="pwd">
 			<span>登录密码：</span>
-			<input id="txt_login_pwd" class="easyui-passwordbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+			<input id="txt_password" class="easyui-passwordbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>公司名称：</span>
-			<input id="cmb_company_name" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]'],mode:'remote',url:'/PFXFundOrganization/GetVaguePrivateCompanyName'" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+			<input id="cmb_company_name" class="easyui-combobox easyui-validatebox" data-options="required:true,validType:['length[0,100]'],mode:'remote',url:'/PFXFundOrganization/GetVaguePrivateCompanyName',valueField:'hpcompany_id',textField:'cn_name'" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>联系电话：</span>
-			<input id="txt_telephone" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;&nbsp;&nbsp
+			<input id="txt_telephone" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;&nbsp;&nbsp;
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>联系邮箱：</span>
-			<input id="txt_mailbox" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]','email']" style="width:200px">&nbsp;&nbsp;&nbsp;&nbsp
+			<input id="txt_mailbox" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]','email']" style="width:200px">&nbsp;&nbsp;&nbsp;&nbsp;
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>所属部门：</span>
@@ -65,16 +76,17 @@
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>到期日期：</span>
-			<input id="date_expiretime" class="easyui-datebox" data-options="required:true,editable:false" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+			<input id="date_expiretime" class="easyui-datebox" data-options="editable:false" style="width:200px">&nbsp;&nbsp;&nbsp;&nbsp;
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>负&nbsp;责&nbsp;人：</span>
-			<select id="cmb_person_liable" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false">   
-				<option value="0">否</option>   
-				<option value="1">是</option>
-			</select>&nbsp;&nbsp;<span style="color:red;">*</span>
+			<input id="txt_person_liable" class="easyui-textbox easyui-validatebox" data-options="validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;&nbsp;&nbsp;
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
+			<span>所属角色：</span>
+			<input id="cmb_role" class="easyui-combobox easyui-validatebox" data-options="required:true,editable:false,multiple:true,url:'/PFXFundOrganization/GetPrivateRoleToList',valueField:'id',textField:'role'" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;text-align:right;padding-right:10px;display:none;">
 			<span>是否为负责人：</span>
 			<select id="cmb_is_person_liable" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false">   
 				<option value="0">否</option>   
@@ -83,24 +95,75 @@
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>消息显示公司名称：</span>
-			<select id="cmb_iscompany_show" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false">   
+			<select id="cmb_iscompany_show" class="easyui-combobox" name="dept" style="width:200px;" data-options="required:true,editable:false">   
 				<option value="0">否</option>   
 				<option value="1">是</option>
 			</select>&nbsp;&nbsp;<span style="color:red;">*</span>
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>用户状态：</span>
-			<select id="cmb_status" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false">   
+			<select id="cmb_status" class="easyui-combobox" name="dept" style="width:200px;" data-options="required:true,editable:false">   
 				<option value="1">可用</option>
 				<option value="0">不可用</option>   
 			</select>&nbsp;&nbsp;<span style="color:red;">*</span>
 		</div>
 		<div style="margin-top:5px;text-align:right;padding-right:10px;">
 			<span>是否可登录：</span>
-			<select id="cmb_islogin" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false">   
+			<select id="cmb_islogin" class="easyui-combobox" name="dept" style="width:200px;" data-options="required:true,editable:false">   
 				<option value="1">可用</option>
 				<option value="0">不可用</option>   
 			</select>&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+	</div>
+	<div id="dlg_upwd" class="easyui-dialog" title="重置密码" style="width:320px;height:200px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<div style="margin-top:5px;">
+			<input type="hidden" id="hid_upwd_id" value=""/>
+			<span>用户名称：</span><span id="p_upwd_name"></span>
+		</div>
+		<div style="margin-top:20px;">
+			<span>登录密码：</span>
+			<input id="txt_upwd_password" class="easyui-passwordbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+		<div style="margin-top:5px;">
+			<span>确认密码：</span>
+			<input id="txt_upwd_q_password" class="easyui-passwordbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+	</div>
+	<div id="dlg_files" class="easyui-dialog" title="附件" style="width:600px;height:500px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<input type="hidden" id="hid_id" value=""/>
+		<div style="margin-top:5px;height:442px;">
+			<table id="file_datagrid" title="附件列表"></table>
+		</div>
+	</div>
+	<div id="dlg_add_files" class="easyui-dialog" title="上传附件" style="width:600px;height:500px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<input type="hidden" id="hid_files_id" value=""/>
+		<div style="margin-top:5px;">
+			@Html.Partial("../Shared/_UploadFileControl.cshtml")
+		</div>
+	</div>
+	<div id="dlg_delay" class="easyui-dialog" title="试用延期" style="width:320px;height:160px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<div style="margin-top:5px;">
+			<input type="hidden" id="hid_delay_id" value=""/>
+			<span>用户名称：</span><span id="p_delay_name"></span>
+		</div>
+		<div style="margin-top:20px;">
+			<span>延期日期：</span>
+			<input id="date_delay_expiretime" class="easyui-datebox" data-options="required:true,editable:false" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+		</div>
+	</div>
+	<div id="dlg_formal" class="easyui-dialog" title="转为正式" style="width:320px;height:160px;padding:5px;"   
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">  
+		<div style="margin-top:5px;">
+			<input type="hidden" id="hid_formal_id" value=""/>
+			<span>用户名称：</span><span id="p_formal_name"></span>
+		</div>
+		<div style="margin-top:20px;">
+			<span>到期日期：</span>
+			<input id="date_formal_expiretime" class="easyui-datebox" data-options="required:true,editable:false" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
 		</div>
 	</div>
 	<script type="text/javascript" src="~/js/pfxfund_organization/user_manager.js?t=@DateTime.Now.ToFileTimeUtc()"></script>

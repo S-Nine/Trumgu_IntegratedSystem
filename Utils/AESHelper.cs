@@ -32,9 +32,32 @@ namespace Trumgu_IntegratedManageSystem.Utils
         }
 
         /// <summary>
-        /// 解密
+        /// 加密
+        /// <param name="input">明文</param>
+        /// <param name="sec">密钥</param>
         /// </summary>
+        public static string EncryptText(string input, string sec)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return null;
+            }
+            var toEncryptArray = Encoding.UTF8.GetBytes(input);
+            var rm = new RijndaelManaged
+            {
+                Key = Encoding.UTF8.GetBytes(sec),
+                Mode = CipherMode.ECB,
+                Padding = PaddingMode.PKCS7
+            };
+            var cTransform = rm.CreateEncryptor();
+            var resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+            return Convert.ToBase64String(resultArray, 0, resultArray.Length);
+        }
+
+        /// <summary>
+        /// 解密
         /// <param name="input">密文</param>
+        /// </summary>
         public static string DecryptText(string input)
         {
             byte[] bytesToBeDecrypted = Convert.FromBase64String(input);
@@ -50,11 +73,34 @@ namespace Trumgu_IntegratedManageSystem.Utils
             return result;
         }
 
+        /// <summary>
+        /// 解密
+        /// <param name="input">密文</param>
+        /// <param name="sec">秘钥</param>
+        /// </summary>
+        public static string DecryptText(string input, string sec)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return null;
+            }
+            var toEncryptArray = Convert.FromBase64String(input);
+            var rm = new RijndaelManaged
+            {
+                Key = Encoding.UTF8.GetBytes(sec),
+                Mode = CipherMode.ECB,
+                Padding = PaddingMode.PKCS7
+            };
+            var cTransform = rm.CreateDecryptor();
+            var resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+            return Encoding.UTF8.GetString(resultArray);
+        }
+
         private static byte[] AESEncryptBytes(byte[] bytesToBeEncrypted, byte[] passwordBytes)
         {
             byte[] encryptedBytes = null;
 
-            var saltBytes = new byte[9] { 13, 34, 27, 67, 189, 255, 104, 219 ,122};
+            var saltBytes = new byte[9] { 13, 34, 27, 67, 189, 255, 104, 219, 122 };
 
             using (var ms = new MemoryStream())
             {
@@ -69,7 +115,7 @@ namespace Trumgu_IntegratedManageSystem.Utils
 
                     AES.Mode = CipherMode.CBC;
 
-                    using (var cs = new CryptoStream(ms, AES.CreateEncryptor(), 
+                    using (var cs = new CryptoStream(ms, AES.CreateEncryptor(),
                         CryptoStreamMode.Write))
                     {
                         cs.Write(bytesToBeEncrypted, 0, bytesToBeEncrypted.Length);
@@ -87,7 +133,7 @@ namespace Trumgu_IntegratedManageSystem.Utils
         {
             byte[] decryptedBytes = null;
 
-            var saltBytes = new byte[9] { 13, 34, 27, 67, 189, 255, 104, 219 ,122};
+            var saltBytes = new byte[9] { 13, 34, 27, 67, 189, 255, 104, 219, 122 };
 
             using (var ms = new MemoryStream())
             {
@@ -114,5 +160,22 @@ namespace Trumgu_IntegratedManageSystem.Utils
 
             return decryptedBytes;
         }
-    }    
+
+        public static string GetMD5(string encypStr)
+        {
+            string retStr;
+            MD5CryptoServiceProvider m5 = new MD5CryptoServiceProvider();
+
+            //创建md5对象
+            byte[] inputBye;
+            byte[] outputBye;
+
+            inputBye = Encoding.UTF8.GetBytes(encypStr);
+            outputBye = m5.ComputeHash(inputBye);
+
+            retStr = System.BitConverter.ToString(outputBye);
+            retStr = retStr.Replace("-", "").ToUpper();
+            return retStr;
+        }
+    }
 }

@@ -1,5 +1,15 @@
 var wait_file_list = [];
+var url = null, // 上传文件服务接口
+    type = null; // 上传文件类型（用于区分文件路径）
 $(document).ready(function() {
+    var u = GetUrlParam("url");
+    var t = GetUrlParam("type");
+    if (u != null && u != '') {
+        url = u;
+    }
+    if (t != null && t != '') {
+        type = t;
+    }
     $('.filess').attr('accept', '.xls,xlsx,.doc,.ppt,.zip,.rar,.pdf,.jpg,.png');
     $('.filess').change(selectFile);
 });
@@ -53,10 +63,13 @@ function AjaxFile(file, i) {
     form.append("fileName", name);
     form.append("total", shardCount); //总片数
     form.append("index", i + 1); //当前是第几片
+    if (type != null) {
+        form.append("type", type);
+    }
     UploadPath = file.lastModified
         //Ajax提交文件
     $.ajax({
-        url: "/Public/UploadSliceFile",
+        url: "/Public/" + (url != null ? url : "UploadSliceFile"),
         type: "POST",
         data: form,
         async: true, //异步
@@ -143,5 +156,27 @@ function setHistoryFileList(files) {
                 ' </div>';
             $('#upload_add').before(h);
         }
+    }
+}
+
+/**
+ * 获取Url参数
+ * @param {参数名称} paraName 
+ */
+function GetUrlParam(paraName) {
+    var url = document.location.toString();
+    var arrObj = url.split("?");
+    if (arrObj.length > 1) {
+        var arrPara = arrObj[1].split("&");
+        var arr;
+        for (var i = 0; i < arrPara.length; i++) {
+            arr = arrPara[i].split("=");
+            if (arr != null && arr[0] == paraName) {
+                return arr[1];
+            }
+        }
+        return "";
+    } else {
+        return "";
     }
 }

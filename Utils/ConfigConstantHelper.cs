@@ -22,7 +22,7 @@ namespace Trumgu_IntegratedManageSystem.Utils
         /// <summary>
         /// fund库
         /// </summary>
-        public static string fund_connstr{get;set;}
+        public static string fund_connstr { get; set; }
 
         /// <summary>
         /// 技术支持
@@ -33,5 +33,10 @@ namespace Trumgu_IntegratedManageSystem.Utils
         /// 技术支持
         /// </summary>
         public static string TechnicalSupport { get; set; }
+
+        /// <summary>
+        /// XFund系统上传文件的本目录
+        /// </summary>
+        public static string XFundUploadFileRootPath { get; set; }
     }
 }

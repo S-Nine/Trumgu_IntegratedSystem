@@ -5,11 +5,14 @@ using Trumgu_IntegratedManageSystem.Models;
 using Trumgu_IntegratedManageSystem.Models.sys;
 using Trumgu_IntegratedManageSystem.Models.xfund;
 
-namespace Trumgu_IntegratedManageSystem.Utils {
-    public class DataContextHelper : DbContext {
-        public DataContextHelper (DbContextOptions<DataContextHelper> options) : base (options) { }
+namespace Trumgu_IntegratedManageSystem.Utils
+{
+    public class DataContextHelper : DbContext
+    {
+        public DataContextHelper(DbContextOptions<DataContextHelper> options) : base(options) { }
 
-        protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder) {
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
             // optionsBuilder.UseMySQL(@"server=127.0.0.1;port=3306;database=trumgu_ims_db;uid=root;pwd=Cy616620664.;charset='utf8';SslMode=None;");
         }
 
@@ -108,11 +111,51 @@ namespace Trumgu_IntegratedManageSystem.Utils {
         /// <summary>
         /// XFund（私募版）用户表
         /// </summary>
-        public DbSet<xfund_t_pf_sys_userExObj> xfund_t_pf_sys_user { get; set; }
+        public DbSet<xfund_t_pf_sys_userExObj> xfund_t_pf_sys_userEx { get; set; }
+
+        /// <summary>
+        /// XFund（私募版）用户表
+        /// </summary>
+        public DbSet<xfund_t_pf_sys_userObj> xfund_t_pf_sys_user { get; set; }
 
         /// <summary>
         /// XFund系统配置表
-        /// </summary>]
+        /// </summary>
         public DbSet<xfund_t_sys_dictionariesObj> xfund_t_sys_dictionaries { get; set; }
+
+        /// <summary>
+        /// 私募公司主表
+        /// </summary>
+        public DbSet<xfund_t_fund_companyObj> xfund_t_fund_company { get; set; }
+
+        /// <summary>
+        /// 私募角色表
+        /// </summary>
+        public DbSet<xfund_t_pf_sys_roleObj> xfund_t_pf_sys_role { get; set; }
+
+        /// <summary>
+        /// 私募用户角色关系表
+        /// </summary>   
+        public DbSet<xfund_t_pf_sys_role_userObj> xfund_t_pf_sys_role_user { get; set; }
+
+        /// <summary>
+        /// 私募菜单表
+        /// </summary>  
+        public DbSet<xfund_t_pf_sys_menuObj> xfund_t_pf_sys_menu { get; set; }
+
+        /// <summary>
+        /// 私募菜单按钮表
+        /// </summary> 
+        public DbSet<xfund_t_pf_sys_buttonObj> xfund_t_pf_sys_button { get; set; }
+
+        /// <summary>
+        /// 私募菜单、按钮、角色关系表
+        /// </summary> 
+        public DbSet<xfund_t_pf_sys_button_rightObj> xfund_t_pf_sys_button_right { get; set; }
+
+        /// <summary>
+        /// 私募公司尽调信息表
+        /// </summary> 
+        public DbSet<xfund_t_due_jdxxObj> xfund_t_due_jdxx { get; set; }
     }
 }

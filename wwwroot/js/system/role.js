@@ -212,8 +212,15 @@ function initEvent() {
     });
 
     $('#tree_right').tree({
+        lines: true,
+        url: '/System/GetRoleMenuRight/',
+        method: 'POST',
+        animate: true,
         checkbox: true,
-        lines: true
+        loadFilter: function(data) {
+            data = recursionChecked(data);
+            return data;
+        }
     });
 }
 
@@ -283,18 +290,9 @@ function initButtonEvent() {
                 $('#right_save').linkbutton("enable");
             }
             $('#hid_right_id').val(rows[0].id);
-            $('#tree_right').tree({ data: [] });
             $('#tree_right').tree({
-                url: '/System/GetRoleMenuRight/',
-                method: 'POST',
-                animate: true,
-                checkbox: true,
-                queryParams: { id: rows[0].id },
-                loadFilter: function(data) {
-                    data = recursionChecked(data);
-                    return data;
-                }
-
+                data: [],
+                queryParams: { id: rows[0].id }
             });
             $('#dlg_add_right').dialog('open');
         } else {

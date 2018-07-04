@@ -247,5 +247,263 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             }
             return Json(new { total = total, rows = users });
         }
+
+        /// <summary>
+        /// 私募公司尽调上传页面
+        /// </summary>
+        public IActionResult PrivateCompanyInvestigation()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 分页获取私募公司尽调上传
+        /// </summary>
+        public JsonResult GetPrivateCompanyInvestigationToPage(xfund_t_fund_companySelObj sel)
+        {
+            int total = 0;
+            List<xfund_t_fund_companyExObj> company = null;
+            if (sel.page == null)
+            {
+                sel.page = 1;
+            }
+            if (sel.rows == null)
+            {
+                sel.rows = 15;
+            }
+            Utils.DataContextHelper db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            total = (from t1 in db.xfund_t_fund_company
+                     join t2 in db.xfund_t_due_jdxx
+                     on t1.regis_code equals t2.gsbh into t3
+                     from t4 in t3.DefaultIfEmpty()
+                     where t1.type_of_funds == "证券投资基金" && (!string.IsNullOrWhiteSpace(sel.cn_name_like) ? t1.cn_name.Contains(sel.cn_name_like) : true)
+                     && (sel.isIntroduction != null ? (sel.isIntroduction == true ? !string.IsNullOrWhiteSpace(t4.gsjs) : string.IsNullOrWhiteSpace(t4.gsjs)) : true)
+                     && (sel.isInvestigation != null ? (sel.isInvestigation == true ? !string.IsNullOrWhiteSpace(t4.jdjl) : string.IsNullOrWhiteSpace(t4.jdjl)) : true)
+                     select new xfund_t_fund_companyExObj()
+                     {
+                         cn_name = t1.cn_name,
+                         gsjs = t4.gsjs,
+                         regis_code = t1.regis_code,
+                         jdjl = t4.jdjl
+                     }).Count();
+            if (total > 0)
+            {
+                company = (from t1 in db.xfund_t_fund_company
+                           join t2 in db.xfund_t_due_jdxx
+                           on t1.regis_code equals t2.gsbh into t3
+                           from t4 in t3.DefaultIfEmpty()
+                           where t1.type_of_funds == "证券投资基金" && (!string.IsNullOrWhiteSpace(sel.cn_name_like) ? t1.cn_name.Contains(sel.cn_name_like) : true)
+                           && (sel.isIntroduction != null ? (sel.isIntroduction == true ? !string.IsNullOrWhiteSpace(t4.gsjs) : string.IsNullOrWhiteSpace(t4.gsjs)) : true)
+                     && (sel.isInvestigation != null ? (sel.isInvestigation == true ? !string.IsNullOrWhiteSpace(t4.jdjl) : string.IsNullOrWhiteSpace(t4.jdjl)) : true)
+                           select new xfund_t_fund_companyExObj()
+                           {
+                               cn_name = t1.cn_name,
+                               gsjs = t4.gsjs,
+                               regis_code = t1.regis_code,
+                               jdjl = t4.jdjl,
+                               jdcs = t4.jdcs
+                           })
+                    .Skip(sel.page != 1 ? ((int)sel.page - 1) * (int)sel.rows : 0)
+                    .Take((int)sel.rows)
+                    .ToList();
+            }
+            db.Dispose();
+            if (company == null)
+            {
+                company = new List<xfund_t_fund_companyExObj>();
+            }
+            return Json(new { total = total, rows = company });
+        }
+
+        /// <summary>
+        /// 根据私募公司注册编号清空公司介绍附件
+        /// </summary>
+        [HttpPost]
+        public JsonResult CleanPrivateCompanyIntroduce(string regis_code)
+        {
+            ResultObj ro = new ResultObj() { code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL, msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString() };
+            if (!string.IsNullOrWhiteSpace(regis_code))
+            {
+                Utils.DataContextHelper db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+                List<xfund_t_due_jdxxObj> list = db.xfund_t_due_jdxx.Where(rec => rec.gsbh == regis_code).ToList();
+                if (list != null && list.Count > 0)
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        list[i].gsjs = "";
+                    }
+                    db.xfund_t_due_jdxx.UpdateRange(list);
+                    if (db.SaveChanges() > 0)
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                        ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                    }
+                    else
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                        ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                    }
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                db.Dispose();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+            }
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 根据私募公司注册编号清空公司尽调附件
+        /// </summary>
+        [HttpPost]
+        public JsonResult CleanPrivateCompanyInvestigation(string regis_code)
+        {
+            ResultObj ro = new ResultObj() { code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL, msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString() };
+            if (!string.IsNullOrWhiteSpace(regis_code))
+            {
+                Utils.DataContextHelper db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+                List<xfund_t_due_jdxxObj> list = db.xfund_t_due_jdxx.Where(rec => rec.gsbh == regis_code).ToList();
+                if (list != null && list.Count > 0)
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        list[i].jdjl = "";
+                        list[i].jdcs = 0;
+                    }
+                    db.xfund_t_due_jdxx.UpdateRange(list);
+                    if (db.SaveChanges() > 0)
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                        ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                    }
+                    else
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                        ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                    }
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                db.Dispose();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+            }
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 添加私募公司公司介绍
+        /// </summary>
+        [HttpPost]
+        public JsonResult AddIntroduce(string regis_code, List<FileInfoObj> files)
+        {
+            ResultObj ro = new ResultObj() { code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL, msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString() };
+            if (!string.IsNullOrWhiteSpace(regis_code) && files != null && files.Count == 1)
+            {
+                Utils.DataContextHelper db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+                List<xfund_t_due_jdxxObj> list = db.xfund_t_due_jdxx.Where(rec => rec.gsbh == regis_code).ToList();
+                if (list == null || list.Count == 0)
+                {
+                    xfund_t_due_jdxxObj m = new xfund_t_due_jdxxObj();
+                    m.gsbh = regis_code;
+                    m.gsjs = files[0].fileUrl;
+                }
+                else if (list.Count == 1)
+                {
+                    list[0].gsjs = files[0].fileUrl;
+                    db.UpdateRange(list[0]);
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_FORMAT;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_FORMAT.ToString();
+                    ro.data = "尽调信息不唯一！";
+                }
+
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+
+                db.Dispose();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+            }
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 添加私募公司尽调记录
+        /// </summary>
+        [HttpPost]
+        public JsonResult AddInvestigation(string regis_code, List<FileInfoObj> files)
+        {
+            ResultObj ro = new ResultObj() { code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL, msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString() };
+            if (!string.IsNullOrWhiteSpace(regis_code) && files != null && files.Count == 1)
+            {
+                Utils.DataContextHelper db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+                List<xfund_t_due_jdxxObj> list = db.xfund_t_due_jdxx.Where(rec => rec.gsbh == regis_code).ToList();
+                if (list == null || list.Count == 0)
+                {
+                    xfund_t_due_jdxxObj m = new xfund_t_due_jdxxObj();
+                    m.gsbh = regis_code;
+                    m.jdjl = files[0].fileUrl;
+                    m.jdcs = 1;
+                }
+                else if (list.Count == 1)
+                {
+                    list[0].jdjl = files[0].fileUrl;
+                    list[0].jdcs += 1;
+                    db.UpdateRange(list[0]);
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_FORMAT;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_FORMAT.ToString();
+                    ro.data = "尽调信息不唯一！";
+                }
+
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+
+                db.Dispose();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+            }
+            return Json(ro);
+        }
     }
 }

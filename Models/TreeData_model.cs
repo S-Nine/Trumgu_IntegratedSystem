@@ -50,7 +50,7 @@ namespace Trumgu_IntegratedManageSystem.Models
     {
         public string id { get; set; }
         public int? key { get; set; }
-        public int? parent_id { get; set; }
+        public string parent_id { get; set; }
         public string text { get; set; }
         public string iconCls { get; set; }
         public int? level { get; set; }
