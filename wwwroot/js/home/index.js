@@ -14,11 +14,6 @@ function initEvent() {
             iconCls: 'icon-save',
             handler: function() {
                 if (isValidate('dlg_update_pwd')) {
-                    if ($('#pwd_save').linkbutton("options").disabled) { // 防止重复提交数据
-                        return;
-                    }
-                    $('#pwd_save').linkbutton("disable"); // 禁用
-
                     var params = {
                         o_pwd: $('#txt_login_o_pwd').passwordbox('getValue'),
                         n_pwd: $('#txt_login_n_pwd').passwordbox('getValue'),
@@ -29,6 +24,11 @@ function initEvent() {
                         $.messager.alert('提示', '确认密码与新密码不一致！');
                         return;
                     }
+
+                    if ($('#pwd_save').linkbutton("options").disabled) { // 防止重复提交数据
+                        return;
+                    }
+                    $('#pwd_save').linkbutton("disable"); // 禁用
 
                     $.ajax({
                         url: '/System/UpdatePWD/',
@@ -147,6 +147,9 @@ function loginout() {
 }
 
 function showUpdatePwd() {
+    if ($('#pwd_save').linkbutton("options").disabled) {
+        $('#pwd_save').linkbutton("enable");
+    }
     $('#txt_login_o_pwd').passwordbox('clear');
     $('#txt_login_n_pwd').passwordbox('clear');
     $('#txt_login_q_pwd').passwordbox('clear');

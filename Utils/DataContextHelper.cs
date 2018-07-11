@@ -5,14 +5,11 @@ using Trumgu_IntegratedManageSystem.Models;
 using Trumgu_IntegratedManageSystem.Models.sys;
 using Trumgu_IntegratedManageSystem.Models.xfund;
 
-namespace Trumgu_IntegratedManageSystem.Utils
-{
-    public class DataContextHelper : DbContext
-    {
-        public DataContextHelper(DbContextOptions<DataContextHelper> options) : base(options) { }
+namespace Trumgu_IntegratedManageSystem.Utils {
+    public class DataContextHelper : DbContext {
+        public DataContextHelper (DbContextOptions<DataContextHelper> options) : base (options) { }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
+        protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder) {
             // optionsBuilder.UseMySQL(@"server=127.0.0.1;port=3306;database=trumgu_ims_db;uid=root;pwd=Cy616620664.;charset='utf8';SslMode=None;");
         }
 
@@ -157,5 +154,15 @@ namespace Trumgu_IntegratedManageSystem.Utils
         /// 私募公司尽调信息表
         /// </summary> 
         public DbSet<xfund_t_due_jdxxObj> xfund_t_due_jdxx { get; set; }
+
+        /// <summary>
+        /// 系统字典表
+        /// </summary> 
+        public DbSet<t_sys_dictionariesObj> t_sys_dictionaries { get; set; }
+
+        /// <summary>
+        /// 组织过程资产表
+        /// </summary> 
+        public DbSet<t_assets_organizational_process_assetsObj> t_assets_organizational_process_assets { get; set; }
     }
 }

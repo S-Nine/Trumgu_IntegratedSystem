@@ -263,14 +263,16 @@ function initEvent() {
         }]
     });
 
-    $('#tree_delp').tree({
-        checkbox: true,
-        lines: true
-    });
-
     $('#tree_role').tree({
+        url: '/System/GetUserRole/',
+        method: 'POST',
+        animate: true,
         checkbox: true,
-        lines: true
+        lines: true,
+        loadFilter: function(data) {
+            data = recursionChecked(data);
+            return data;
+        }
     });
 }
 
@@ -369,18 +371,8 @@ function initButtonEvent() {
                 $('#role_save').linkbutton("enable");
             }
             $('#hid_user_id2').val(rows[0].id);
-            $('#tree_role').tree({ data: [] });
             $('#tree_role').tree({
-                url: '/System/GetUserRole/',
-                method: 'POST',
-                animate: true,
-                checkbox: true,
-                queryParams: { id: rows[0].id },
-                loadFilter: function(data) {
-                    data = recursionChecked(data);
-                    return data;
-                }
-
+                queryParams: { id: rows[0].id }
             });
             $('#dlg_add_role').dialog('open');
         } else {
