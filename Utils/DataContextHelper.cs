@@ -164,5 +164,26 @@ namespace Trumgu_IntegratedManageSystem.Utils {
         /// 组织过程资产表
         /// </summary> 
         public DbSet<t_assets_organizational_process_assetsObj> t_assets_organizational_process_assets { get; set; }
+
+        /// <summary>
+        /// 私募热点投票
+        /// </summary>
+        public DbSet<voteObj> t_vote { get; set; }
+
+        /// <summary>
+        /// 私募投票选项
+        /// </summary>
+        public DbSet<voteOptionObj> t_voteOption { get; set; }
+
+        /// <summary>
+        /// 投票统计
+        /// </summary>
+        public DbSet<voteAnswerObj> t_voteAnswer { get; set; }
+
+        /// <summary>
+        /// 投票留言(联查)
+        /// </summary>
+        public DbSet<voteLeaveObj> t_voteLeave { get; set; }
+
     }
 }

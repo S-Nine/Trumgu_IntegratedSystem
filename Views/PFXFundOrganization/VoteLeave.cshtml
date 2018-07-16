@@ -1,0 +1,43 @@
+﻿@using Trumgu_IntegratedManageSystem.Utils
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>投票留言</title>
+    <link rel="stylesheet" type="text/css" href="~/css/layout.css">
+    <link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/icon.css">
+    <link href="~/js/utils/My97DatePicker/skin/default/datepicker.css" rel="stylesheet" />
+    <script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.min.js"></script>
+    <script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="~/js/utils/tools.js"></script>
+    <script type="text/javascript" src="~/js/utils/config.js"></script>
+    <script type="text/javascript" src="~/js/utils/easyui-extend.js"></script>
+    <script type="text/javascript" src="~/js/utils/moment-with-locales.js"></script>
+    <script src="~/js/utils/My97DatePicker/WdatePicker.js"></script>
+    <script src="~/js/utils/My97DatePicker/lang/zh-cn.js"></script>
+</head>
+<body style="height:100%;overflow:hidden;">
+    <div class="content" style="padding: 78px 0 0;">
+        <div class="operation_area" style="height:78px;">
+            <div class="easyui-panel" style="padding: 5px; height: 38px; width: 100%;">
+                热点投票: @Html.DropDownList("voteSelect", ViewBag.Select as List<SelectListItem>,new{@class= "easyui-combobox" } )
+                &nbsp;&nbsp;留言内容关键字：<input id="txt_key" class="easyui-textbox" style="width: 150px">
+
+            </div>
+            @Html.Partial("../Shared/_ButtonTools.cshtml")
+        </div>
+        <div class="datagrid_area" style="width:100%;display:inline-block;">
+            <table id="leave_datagrid" title="留言列表"></table>
+        </div>
+    </div>
+    
+
+    
+    <script type="text/javascript" src="~/js/pfxfund_organization/vote_leave.js?t=@DateTime.Now.ToFileTimeUtc()"></script>
+</body>
+</html>
