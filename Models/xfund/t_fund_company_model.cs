@@ -263,6 +263,8 @@ namespace Trumgu_IntegratedManageSystem.Models.xfund
         public string gsjs { get; set; }
 
         public int? jdcs { get; set; }
+
+        public string company_intro { get; set; }
     }
 
     public class xfund_t_fund_companySelObj
@@ -281,4 +283,23 @@ namespace Trumgu_IntegratedManageSystem.Models.xfund
         /// </summary>
         public bool? isInvestigation { get; set; }
     }
+
+    [Table("t_company_info")]
+    public class t_company_infoObj
+    {
+        public int id { get; set; }
+        public string company_name { get; set; }
+        public string company_shortname { get; set; }
+        public string company_intro { get; set; }
+        public string invest_idea { get; set; }
+        public string core_person { get; set; }
+        public string regis_code { get; set; }
+        public int? jy_id { get; set; }
+        public DateTime? insert_date { get; set; }
+        public int? edit_mark { get; set; }
+    }
+
+
+
+
 }

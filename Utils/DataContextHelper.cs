@@ -185,5 +185,7 @@ namespace Trumgu_IntegratedManageSystem.Utils {
         /// </summary>
         public DbSet<voteLeaveObj> t_voteLeave { get; set; }
 
+        public DbSet<t_company_infoObj> t_companyInfo { get; set; }
+
     }
 }

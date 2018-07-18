@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -89,6 +90,9 @@ namespace Trumgu_IntegratedManageSystem
             ConfigConstantHelper.ProgramName = config["ProgramStr:ProgramName"];
             ConfigConstantHelper.TechnicalSupport = config["ProgramStr:TechnicalSupport"];
             ConfigConstantHelper.XFundUploadFileRootPath = config["SystemConfig:XFundUploadFileRootPath"];
+
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            Encoding.GetEncoding("GB2312");
         }
     }
 }

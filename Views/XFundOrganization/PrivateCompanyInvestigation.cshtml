@@ -1,4 +1,4 @@
-@{ Layout = null; }
+﻿@{ Layout = null; }
 <!DOCTYPE html>
 <html>
 
@@ -14,7 +14,22 @@
     <script type="text/javascript" src="~/js/utils/tools.js"></script>
     <script type="text/javascript" src="~/js/utils/config.js"></script>
     <script type="text/javascript" src="~/js/utils/easyui-extend.js"></script>
+    <style>
+        .span_left {
+            text-align: right;
+            display: inline-block;
+            width: 100px
+        }
+
+        .span_right {
+            text-align: right;
+            display: inline-block;
+            width: 150px
+        }
+    </style>
 </head>
+
+
 
 <body style="height:100%;overflow:hidden;">
     <div class="content" style="padding: 78px 0 0;overflow:hidden;">
@@ -35,6 +50,95 @@
         <div style="margin-top:5px;">
             @Html.Partial("../Shared/_UploadFileControl.cshtml")
         </div>
+    </div>
+
+    <div id="dlg_add_info" class="easyui-dialog" title="信息维护" style="width:800px;height:600px;padding:5px;"
+         data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">
+        <input type="hidden" id="hid_id" value="" />
+        <div style="margin-top:5px;">
+            <span class="span_left">公司名称：</span>
+            <input id="txt_cn_name" class="easyui-textbox" style="width:200px" readonly="readonly">
+            <span class="span_right">登记编码：</span>
+            <input id="txt_regis_code" class="easyui-textbox" style="width:200px" readonly="readonly">
+        </div>
+        <div style="margin-top:5px;">
+            <span class="span_left">成立时间：</span>
+            <input id="txt_setup_date" class="easyui-datebox" data-options="editable:false" style="width:200px">
+            <span class="span_right">英文名称：</span>
+            <input id="txt_en_name" class="easyui-textbox" style="width:200px">
+        </div>
+        <div style="margin-top:5px;">
+            <span class="span_left">法定代表人：</span>
+            <input id="txt_legal_repre" class="easyui-textbox" style="width:200px">
+            <span class="span_right">企业性质：</span>
+            <select id="txt_corp_property" class="easyui-combobox" style="width:200px">
+                <option value="内资企业">内资企业</option>
+                <option value="外商独资企业">外商独资企业</option>
+                <option value="中外合资企业">中外合资企业</option>
+            </select>
+
+        </div>
+        <div style="margin-top:5px;">
+            <span class="span_left">组织机构代码证：</span>
+            <input id="txt_org_code" class="easyui-textbox" style="width:200px">
+            <span class="span_right">注册资本：</span>
+            <input id="txt_regis_capital" class="easyui-textbox" style="width:200px"><span>&nbsp;&nbsp;(万元)</span>
+        </div>
+        <div style="margin-top: 5px;">
+            <span class="span_left">备案时间：</span>
+            <input id="txt_regis_date" class="easyui-datebox" data-options="editable:false" style="width:200px">
+            <span class="span_right">实缴资本：</span>
+            <input id="txt_paidin_capital" class="easyui-textbox" style="width: 200px"><span>&nbsp;&nbsp;(万元)</span>
+
+        </div>
+        <div style="margin-top:5px;">
+
+            <span class="span_left">会员资格：</span>
+            <select id="txt_if_member" class="easyui-combobox" style="width:200px">
+                <option value="是">是</option>
+                <option value="否">否</option>
+            </select>
+            <span class="span_right">管理规模：</span>
+            <input id="txt_company_scale" class="easyui-textbox" style="width:200px"><span>&nbsp;&nbsp;(万元)</span>
+
+        </div>
+
+        <div style="margin-top:5px;">
+            
+            <span class="span_left">产品数量：</span>
+            <input id="txt_fund_count" class="easyui-textbox" style="width:200px">
+            <span class="span_right">员工数量：</span>
+            <input id="txt_staff_count" class="easyui-textbox" style="width:200px">
+        </div>
+
+        <div style="margin-top:5px;">
+            <span class="span_left">官网地址：</span>
+            <input id="txt_website" class="easyui-textbox" style="width:557px">
+        </div>
+        <div style="margin-top:5px;">
+            <span class="span_left">注册地址：</span>
+            <input id="txt_regis_address" class="easyui-textbox" style="width:557px">
+        </div>
+        <div style="margin-top:5px;">
+            <span class="span_left">办公地址：</span>
+            <input id="txt_address" class="easyui-textbox" style="width:557px">
+        </div>
+        <div style="margin-top:5px;">
+            <span class="span_left">公司介绍：</span>
+            <textarea id="txt_company_intro" style="width: 550px" rows="4"></textarea>
+        </div>
+        <div style="margin-top:5px;">
+            <span class="span_left">投资理念：</span>
+            <textarea id="txt_invest_idea" style="width: 550px" rows="4"></textarea>
+
+        </div>
+        <div style="margin-top:5px;">
+            <span class="span_left">核心团队：</span>
+            <textarea id="txt_core_person" style="width: 550px" rows="4"></textarea>
+
+        </div>
+
+
     </div>
     <script type="text/javascript" src="~/js/xfund_organization/private_company_investigation.js?t=@DateTime.Now.ToFileTimeUtc()"></script>
 </body>

@@ -103,15 +103,18 @@ function onClickMenu2() {
     var path = $(this).attr('data-path');
     var icon = $(this).attr('data-icon');
 
+
     var tab = $('#tab_content').tabs('getTab', name);
+    console.log(tab);
     if (tab != null) {
         $('#tab_content').tabs('select', name);
-    } else if (path != null && $.trim(path) != '') {
+    } else if (path != null && $.trim(path) !== '') {
+        console.log(path);
         $('#tab_content').tabs('add', {
             title: name,
             content: '<div style="width:100%;height:100%;overflow:hidden;"><iframe style="width:100%;height:100%;border:0px;" src="' + path + '?menu_id=' + id + '"></iframe></div>',
             iconCls: icon,
-            closable: true,
+            closable: true
         });
     }
 }

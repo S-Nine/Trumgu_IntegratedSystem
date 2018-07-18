@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -505,5 +506,125 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             }
             return Json(ro);
         }
+
+
+        /// <summary>
+        /// 根据公司编码得到回显数据
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public JsonResult GetCompanyInfo(string code)
+        {
+            
+            var ro = new xfund_t_fund_companyExObj();
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var model = db.xfund_t_fund_company.FirstOrDefault(m => m.regis_code == code);
+
+            if (model == null)
+            {
+                return null;
+            }
+
+            ro.id = model.id;
+            ro.cn_name = model.cn_name;
+            ro.regis_code = model.regis_code;
+            ro.setup_date = model.setup_date;
+            ro.en_name = model.en_name;
+            ro.legal_repre = model.legal_repre;
+            ro.corp_property = model.corp_property;
+            ro.org_code = model.org_code;
+            ro.regis_capital = model.regis_capital;
+            ro.regis_date = model.regis_date;
+            ro.paidin_capital = model.paidin_capital;
+            ro.fund_count = model.fund_count;
+            ro.if_member = model.if_member;
+            ro.company_scale = model.company_scale;
+            ro.staff_count = model.staff_count;
+            ro.website = model.website;
+            ro.regis_address = model.regis_address;
+            ro.address = model.address;
+
+            var modelEx = db.t_companyInfo.FirstOrDefault(m => m.id.ToString() == model.hpcompany_id);
+            if (modelEx == null)
+            {
+                return Json(ro);
+            }
+
+            ro.company_intro = modelEx.company_intro;
+            ro.invest_idea = modelEx.invest_idea;
+            ro.core_person = modelEx.core_person;
+
+
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 修改公司详细信息
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public JsonResult UpdateCompanyInfo(xfund_t_fund_companyExObj obj)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var model = db.xfund_t_fund_company.FirstOrDefault(m => m.id == obj.id);
+            if (model != null)
+            {
+                model.regis_code = obj.regis_code;
+                model.setup_date = obj.setup_date;
+                model.en_name = obj.en_name;
+                model.legal_repre = obj.legal_repre;
+                model.corp_property = obj.corp_property;
+                model.org_code = obj.org_code;
+                model.regis_capital = obj.regis_capital;
+                model.regis_date = obj.regis_date;
+                model.paidin_capital = obj.paidin_capital;
+                model.fund_count = obj.fund_count;
+                model.if_member = obj.if_member;
+                model.company_scale = obj.company_scale;
+                model.staff_count = obj.staff_count;
+                model.website = obj.website;
+                model.regis_address = obj.regis_address;
+                model.address = obj.address;
+                var modelEx = db.t_companyInfo.FirstOrDefault(m => m.id.ToString() == model.hpcompany_id);
+                if (modelEx != null)
+                {
+                    modelEx.company_intro = obj.company_intro;
+                    modelEx.invest_idea = obj.invest_idea;
+                    modelEx.core_person = obj.core_person;
+                    db.t_companyInfo.Update(modelEx);
+                }
+
+                db.xfund_t_fund_company.Update(model);
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+                return Json(ro);
+            }
+
+            if (db.SaveChanges() > 0)
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+
+        }
     }
+
+
+    
 }
