@@ -86,8 +86,15 @@ function initStatDatagrid() {
         singleSelect: true,
         columns: [
             [
-                { field: "stat_user", title: "用户", width: 100 },
-                { field: "stat_option", title: "统计", width: 400 }
+                { field: "stat_account", title: "账号", width: 100 },
+                { field: "stat_user", title: "用户名", width: 100 },
+                { field: "stat_option", title: "统计", width: 100 },
+                {
+                    field: "stat_date", title: "投票时间", width: 200 ,
+                    formatter: function (value, row, index) {
+                        return moment(value).format("LLL");
+                    }
+                }
             ]
         ],
         view: DataGridNoDataView,

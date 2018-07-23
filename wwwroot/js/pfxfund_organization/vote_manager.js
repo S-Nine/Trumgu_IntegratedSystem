@@ -222,8 +222,8 @@ function initButtonEvent() {
             $("#txt_content").val(rows[0].vote_content != null ? rows[0].vote_content : "");
             $("#txt_strat").val(rows[0].vote_startdate != null ? moment(rows[0].vote_startdate).format("L") : "");
             $("#txt_end").val(rows[0].vote_enddate != null ? moment(rows[0].vote_enddate).format("L") : "");
-            $("input[name='checkType'][value=" + rows[0].vote_checktype + "]").attr("checked", true); 
-            $("input[name='isColse'][value=" + rows[0].vote_isclosed + "]").attr("checked", true); 
+            $("input[name='checkType'][value=" + rows[0].vote_checktype + "]").prop("checked", true); 
+            $("input[name='isColse'][value=" + rows[0].vote_isclosed + "]").prop("checked", true); 
             $("#dlg_add_vote").dialog("open");
         } else {
             $.messager.alert("提示", "请选择一条角色数据！");
@@ -330,7 +330,8 @@ function cleanDialog() {
     $("#txt_content").val("");
     $("#txt_strat").val("");
     $("#txt_end").val("");
-    
+    $("input[name='checkType'][value=0]").prop("checked", true);
+    $("input[name='isColse'][value=0]").prop("checked", true); 
 };
 
 function cleanOptionDialog() {

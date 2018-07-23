@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -1717,11 +1719,29 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 var optionList = item.Select(m => m.option_id).ToList();
                 //创建选项字符串
                 var optionStr = "";
+                //获取用户投票时间
+                var answerTime = DateTime.MinValue;
+                // ReSharper disable once GenericEnumeratorNotDisposed
+                var answerList = item.GetEnumerator();
+                while (answerList.MoveNext())
+                {
+                    //循环用户所有投票时间
+                    var answerTimeItem = answerList.Current.answer_createdate;
+                    if (answerTimeItem > answerTime)
+                    {
+                        //得到最后的投票时间 复制给answertime
+                        answerTime = answerTimeItem;
+                    }
+                }
                 foreach (var optionItem in optionList)
                 {
                     //根据选项ID 得到选项实体
                     var optionModel = db.t_voteOption.FirstOrDefault(m => m.vote_id == voteId && m.id == optionItem);
-                    if (optionModel != null) optionStr += optionModel.option_header + ",";
+                    if (optionModel != null)
+                    {
+                        optionStr += optionModel.option_header + ",";
+                    }
+
                 }
 
                 if (pfuser != null)
@@ -1730,7 +1750,9 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                     voteStatList.Add(new
                     {
                         stat_user = pfuser.name,
-                        stat_option = optionStr.TrimEnd(',')
+                        stat_option = optionStr.TrimEnd(','),
+                        stat_account = pfuser.userid,
+                        stat_date = answerTime
 
                     });
                 }
@@ -1833,10 +1855,259 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             return Json(ro);
         }
 
+        //----------------------Banner图列表-----------------
+        public IActionResult Banner()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 获取图片列表
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult GetBannerToList()
+        {
+            var resultList = new List<t_pf_bannerEXObj>();
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.t_pf_banner.OrderBy(m => m.banner_sort).ToList();
+            foreach (var item in list)
+            {
+                var model = new t_pf_bannerEXObj
+                {
+                    id = item.id,
+                    banner_link = item.banner_link,
+                    banner_sort = item.banner_sort,
+                    banner_target = item.banner_target,
+                    banner_title = item.banner_title,
+                    banner_url = item.banner_url,
+                    is_enable = item.is_enable,
+                    create_userid = item.create_userid,
+                    create_time = item.create_time,
+                    modify_userid = item.modify_userid,
+                    modify_time = item.modify_time,
+                    web_banner_url = string.IsNullOrWhiteSpace(item.banner_url)
+                        ?
+                        string.Empty
+                        : 
+                        ConfigConstantHelper.PFWebUrl+ item.banner_url
+                };
+                resultList.Add(model);
+            }
+            return Json(resultList);
+        }
+
+
+        /// <summary>
+        /// 添加轮播图列表
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult AddBanner(t_pf_bannerObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            t_sys_userObj user = null;
+            var cUserInfo = HttpContext.Session.GetString("UserInfo");
+            if (!string.IsNullOrWhiteSpace(cUserInfo))
+            {
+                user = Newtonsoft.Json.JsonConvert.DeserializeObject<t_sys_userObj>(cUserInfo);
+            }
+
+            if (user == null)
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_Unauthorized;
+                ro.msg = EResponseState.TRUMGU_IMS_Unauthorized.ToString();
+                return Json(ro);
+            }
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            mdl.create_time = DateTime.Now;
+            mdl.create_userid = user.id;
+            mdl.modify_time = DateTime.Now;
+            mdl.modify_userid = user.id;
+            db.t_pf_banner.Add(mdl);
+            if (db.SaveChanges() > 0)
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 修改轮播图列表
+        /// </summary>
+        /// <param name="mdl"></param>
+        /// <returns></returns>
+        public JsonResult UpdateBanner(t_pf_bannerObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            t_sys_userObj user = null;
+            var cUserInfo = HttpContext.Session.GetString("UserInfo");
+            if (!string.IsNullOrWhiteSpace(cUserInfo))
+            {
+                user = Newtonsoft.Json.JsonConvert.DeserializeObject<t_sys_userObj>(cUserInfo);
+            }
+
+            if (user == null)
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_Unauthorized;
+                ro.msg = EResponseState.TRUMGU_IMS_Unauthorized.ToString();
+                return Json(ro);
+            }
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var model = db.t_pf_banner.FirstOrDefault(m => m.id == mdl.id);
+            if (model != null)
+            {
+                model.banner_title = mdl.banner_title;
+                model.banner_sort = mdl.banner_sort;
+                model.banner_target = mdl.banner_target;
+                model.banner_link = mdl.banner_link;
+                model.is_enable = mdl.is_enable;
+                model.modify_userid = user.id;
+                model.modify_time = DateTime.Now;
+                db.t_pf_banner.Update(model);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+            }
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 删除轮播图列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public JsonResult DeleteBanner(int id)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var model = db.t_pf_banner.FirstOrDefault(m => m.id == id);
+            if (model != null)
+            {
+                db.t_pf_banner.Remove(model);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+
+        //--------------------上传banner轮播图----------------------
+
+        public PartialViewResult BanneView()
+        {
+            return PartialView();
+        }
+
+        [HttpPost]
+        public JsonResult AddBannerImg(IFormCollection files)
+        {
+            var id = Convert.ToInt32(files["uid"].ToString());
+            var file = Request.Form.Files[0];
+            
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            if (id > 0 && file != null)
+            {
+                var savePath = ConfigConstantHelper.PFUploadBannerRootPath;
+                var uploadState = ImageUpload.Upload(file, savePath, out var imgPath);
+                if (uploadState)
+                {
+                    var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+                    var model = db.t_pf_banner.FirstOrDefault(m => m.id == id);
+                    if (model == null)
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                        ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+                        return Json(ro);
+                    }
+                    var index = imgPath.IndexOf(@"\Content\banner\", StringComparison.Ordinal);
+                    imgPath = imgPath.Substring(index, imgPath.Length - index);
+                    imgPath = imgPath.Replace('\\','/');
+                    model.banner_url = imgPath;
+                    db.t_pf_banner.Update(model);
+                    if (db.SaveChanges() > 0)
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                        ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                    }
+                    else
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                        ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                    }
+
+                    db.Dispose();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+            }
+            return Json(ro);
+        }
 
         
 
-
-
     }
+
+
+
+
 }
