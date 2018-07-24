@@ -2071,7 +2071,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                         ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
                         return Json(ro);
                     }
-                    var index = imgPath.IndexOf(@"\Content\banner\", StringComparison.Ordinal);
+                    var index = imgPath.IndexOf(@"\Content\", StringComparison.Ordinal);
                     imgPath = imgPath.Substring(index, imgPath.Length - index);
                     imgPath = imgPath.Replace('\\','/');
                     model.banner_url = imgPath;
