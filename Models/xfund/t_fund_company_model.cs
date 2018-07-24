@@ -254,6 +254,17 @@ namespace Trumgu_IntegratedManageSystem.Models.xfund
 
         private int? _isdelete = null;
         public int? isdelete { get { return _isdelete; } set { _isdelete = value; } }
+
+        /// <summary>
+        /// 入驻状态，初始值0未入驻，1入驻
+        /// </summary>
+        public int settled { get; set; }
+
+        /// <summary>
+        /// 入驻时间
+        /// </summary>
+        public DateTime? settled_date { get; set; }
+
     }
 
     public class xfund_t_fund_companyExObj : xfund_t_fund_companyObj

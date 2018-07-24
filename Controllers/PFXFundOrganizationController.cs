@@ -174,8 +174,24 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             if (db.xfund_t_pf_sys_user.Where(rec => rec.userid == m.userid).Count() <= 0)
             {
                 db.xfund_t_pf_sys_user.Add(m);
+                //查询公司入驻状态,如果为0 改成1
+                var companyModel = db.xfund_t_fund_company.FirstOrDefault(c => c.hpcompany_id == m.hpcompany_id);
+                if (companyModel == null)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+                    return Json(ro);
+                }
+                if (companyModel.settled == 0)
+                {
+                    companyModel.settled = 1;
+                    companyModel.settled_date = DateTime.Now;
+                    db.xfund_t_fund_company.Update(companyModel);
+                }
+
                 if (db.SaveChanges() > 0)
                 {
+                    
                     if (role_id_ary != null && role_id_ary.Count > 0)
                     {
                         List<xfund_t_pf_sys_role_userObj> list_role = new List<xfund_t_pf_sys_role_userObj>();
@@ -274,6 +290,20 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                     db.xfund_t_pf_sys_role_user.AddRange(list_role);
                 }
 
+                //查询公司入驻状态,如果为0 改成1
+                var companyModel = db.xfund_t_fund_company.FirstOrDefault(c => c.hpcompany_id == m.hpcompany_id);
+                if (companyModel == null)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+                    return Json(ro);
+                }
+                if (companyModel.settled == 0)
+                {
+                    companyModel.settled = 1;
+                    companyModel.settled_date = DateTime.Now;
+                    db.xfund_t_fund_company.Update(companyModel);
+                }
                 if (db.SaveChanges() > 0)
                 {
                     ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
@@ -378,7 +408,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             if (!string.IsNullOrWhiteSpace(hpcompany_id))
             {
                 Utils.DataContextHelper db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
-                m = db.xfund_t_fund_company.Where(rec => rec.hpcompany_id == hpcompany_id).FirstOrDefault();
+                m = db.xfund_t_fund_company.FirstOrDefault(rec => rec.hpcompany_id == hpcompany_id);
                 db.Dispose();
             }
 
@@ -414,6 +444,34 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             xfund_t_pf_sys_userObj del = db.xfund_t_pf_sys_user.Where(rec => rec.id == id).FirstOrDefault();
             if (del != null)
             {
+                //查询公司内的用户数量 如果>1 不做操作 如果==1 将公司入驻状态改为0
+                var userCount = db.xfund_t_pf_sys_user.Count(m => m.hpcompany_id == del.hpcompany_id);
+                var companyModel = db.xfund_t_fund_company.FirstOrDefault(c => c.hpcompany_id == del.hpcompany_id);
+                if (companyModel != null)
+                {
+                    var settledVal = companyModel.settled;
+                    if (userCount > 1)
+                    {
+                        if (settledVal == 0)
+                        {
+                            //按理说不会出现这种情况,但出现了应该做出修改
+                            companyModel.settled = 1;
+                            companyModel.settled_date = DateTime.Now;
+                        }
+                        //else==1的情况 就不做处理即可
+                    }
+                    else
+                    {
+                        if (settledVal == 1)
+                        {
+                            companyModel.settled = 0;
+                            companyModel.settled_date = DateTime.MinValue;
+                        }
+                        //else==0的情况不做处理
+                    }
+                    db.xfund_t_fund_company.Update(companyModel);
+                }
+
                 db.xfund_t_pf_sys_user.Remove(del);
                 List<xfund_t_pf_sys_role_userObj> list_role =
                     db.xfund_t_pf_sys_role_user.Where(rec => rec.userid == id).ToList();
@@ -421,7 +479,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                 {
                     db.xfund_t_pf_sys_role_user.RemoveRange(list_role);
                 }
-
+                
                 if (db.SaveChanges() > 0)
                 {
                     ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
