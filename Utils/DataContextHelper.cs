@@ -185,7 +185,16 @@ namespace Trumgu_IntegratedManageSystem.Utils {
         /// </summary>
         public DbSet<voteLeaveObj> t_voteLeave { get; set; }
 
+        /// <summary>
+        /// 公司信息维护
+        /// </summary>
         public DbSet<t_company_infoObj> t_companyInfo { get; set; }
+
+        /// <summary>
+        /// 私募轮播图
+        /// </summary>
+        public DbSet<t_pf_bannerObj> t_pf_banner { get; set; }
+
 
     }
 }

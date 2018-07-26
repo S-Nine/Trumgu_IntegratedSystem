@@ -38,5 +38,15 @@ namespace Trumgu_IntegratedManageSystem.Utils
         /// XFund系统上传文件的本目录
         /// </summary>
         public static string XFundUploadFileRootPath { get; set; }
+
+        /// <summary>
+        /// 私募banner目录
+        /// </summary>
+        public static string PFUploadBannerRootPath { get; set; }
+
+        /// <summary>
+        /// 私募网址
+        /// </summary>
+        public static string PFWebUrl { get; set; }
     }
 }

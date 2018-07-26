@@ -90,6 +90,8 @@ namespace Trumgu_IntegratedManageSystem
             ConfigConstantHelper.ProgramName = config["ProgramStr:ProgramName"];
             ConfigConstantHelper.TechnicalSupport = config["ProgramStr:TechnicalSupport"];
             ConfigConstantHelper.XFundUploadFileRootPath = config["SystemConfig:XFundUploadFileRootPath"];
+            ConfigConstantHelper.PFUploadBannerRootPath = config["SystemConfig:PFUploadBannerRootPath"];
+            ConfigConstantHelper.PFWebUrl = config["SystemConfig:PFWebUrl"];
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding.GetEncoding("GB2312");
