@@ -174,9 +174,9 @@ function initButtonEvent() {
             $('#txt_account_pwd').textbox('setValue', rows[0].account_pwd != null ? rows[0].account_pwd : '');
             $('#txt_account_url').textbox('setValue', rows[0].account_url != null ? rows[0].account_url : '');
             $('#txt_account_email').textbox('setValue', rows[0].account_email != null ? rows[0].account_email : '');
-            $('#txt_account_tel').textbox('setValue', rows[0].account_tel != null ? rows[0].account_tel : 0);
+            $('#txt_account_tel').textbox('setValue', rows[0].account_tel != null ? rows[0].account_tel : '');
             $('#txt_account_register_date').datebox('setValue', rows[0].account_register_date != null ? rows[0].account_register_date : '');
-            $('#txt_remarks').textbox('setValue', rows[0].remarks != null ? rows[0].remarks : 0);
+            $('#txt_remarks').textbox('setValue', rows[0].remarks != null ? rows[0].remarks : '');
             $('#dlg_add_cipher').dialog('open');
 
             $.ajax({
