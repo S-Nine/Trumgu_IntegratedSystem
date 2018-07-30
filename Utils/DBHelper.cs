@@ -16,5 +16,6 @@ namespace Trumgu_IntegratedManageSystem.Utils
             var context = new DataContextHelper(optionBuilder.Options);
             return context;
         }
+        
     }
 }

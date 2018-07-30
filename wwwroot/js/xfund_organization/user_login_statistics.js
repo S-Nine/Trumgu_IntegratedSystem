@@ -92,9 +92,9 @@ function initButtonEvent() {
 
 /**
  * 加载用户登录月度折线图
- * @param {登录账号} login_name 
- * @param {最早登录时间} login_time_min 
- * @param {最晚登录时间} login_time_max 
+ * param {登录账号} login_name 
+ * param {最早登录时间} login_time_min 
+ * param {最晚登录时间} login_time_max 
  */
 function loadLineLoginNum(login_name, login_time_min, login_time_max) {
     clearLineLoginNumChart();
