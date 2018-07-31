@@ -27,14 +27,23 @@ function initDatagrid() {
                 { field: 'telephone', title: '联系电话', width: 100 },
                 { field: 'mailbox', title: '邮箱', width: 100 },
                 { field: 'department', title: '部门', width: 100 },
-                { field: 'expiretime', title: '到期日期', width: 100 },
+                {
+                    field: 'expiretime', title: '到期日期', width: 100,
+                    formatter: function (value, row, index) {
+                        if (value != null) {
+                            return value.replace('T', ' ');
+                        } else {
+                            return '';
+                        }
+                    }
+                },
                 { field: 'person_liable', title: '负责人', width: 100 },
                 {
                     field: 'is_person_liable',
                     title: '是否为负责人',
                     width: 100,
                     formatter: function (value, row, index) {
-                        if (value != null && value == 1) {
+                        if (value != null && value === 1) {
                             return '<span style="color:red;">是</span>';
                         } else {
                             return '否';
@@ -46,7 +55,7 @@ function initDatagrid() {
                     title: '是否为付费用户',
                     width: 100,
                     formatter: function (value, row, index) {
-                        if (value != null && value == 1) {
+                        if (value != null && value === 1) {
                             return '<span style="color:red;">是</span>';
                         } else {
                             return '否';
@@ -58,7 +67,7 @@ function initDatagrid() {
                     title: '消息是否显示公司名称',
                     width: 130,
                     formatter: function (value, row, index) {
-                        if (value != null && value == 1) {
+                        if (value != null && value === 1) {
                             return '<span style="color:red;">是</span>';
                         } else {
                             return '否';
@@ -70,7 +79,7 @@ function initDatagrid() {
                     title: '用户状态',
                     width: 100,
                     formatter: function (value, row, index) {
-                        if (value != null && value == 1) {
+                        if (value != null && value === 1) {
                             return '<span style="color:green;">可用</span>';
                         } else {
                             return '<span style="color:red;">不可用</span>';
@@ -82,7 +91,7 @@ function initDatagrid() {
                     title: '是否可登录',
                     width: 100,
                     formatter: function (value, row, index) {
-                        if (value != null && value == 1) {
+                        if (value != null && value === 1) {
                             return '<span style="color:green;">可用</span>';
                         } else {
                             return '<span style="color:red;">不可用</span>';
@@ -140,6 +149,7 @@ function initEvent() {
             text: "保存",
             iconCls: "icon-save",
             handler: function () {
+                console.log(isValidate("dlg_add_user"));
                 if (isValidate("dlg_add_user")) {
                     if ($("#user_save").linkbutton("options").disabled) { // 防止重复提交数据
                         return;
@@ -168,6 +178,7 @@ function initEvent() {
 
                     };
                     var roleIdAry = $("#cmb_role").combobox("getValues");
+                    console.log(params.id);
                     $.ajax({
                         url: params.id == null || params.id === "" ? "/XFundOrganization/AddXFundUser/" : "/XFundOrganization/UpdateXFundUser/",
                         type: "post",
@@ -220,7 +231,7 @@ function initEvent() {
                     };
                     var roleId = $("#cmb_role").combobox("getValue");
                     $.ajax({
-                        url:  "/XFundOrganization/AddBatchXFundUser/" ,
+                        url: "/XFundOrganization/AddBatchXFundUser/",
                         type: "post",
                         dataType: "json",
                         data: { mdls: params, role_id: roleId },
@@ -281,29 +292,31 @@ function initButtonEvent() {
             cleanAddUserDialog();
             $(".pwd").hide();
             $("#hid_id").val(rows[0].id);
-            $("#hid_parents_id").val(rows[0].parents_id != null ? rows[0].parents_id : "");
 
-            $("#txt_parents_name").textbox("setValue", rows[0].parents_name != null ? rows[0].parents_name : "--");
+            $("#hid_parents_id").val(rows[0].parents_id != null ? rows[0].parents_id : "");
+            $("#txt_parents_name").textbox("setValue", rows[0].parents_id != null ? rows[0].parents_name : "--");
             $("#txt_name").textbox("setValue", rows[0].name);
             $("#txt_userid").textbox("setValue", rows[0].userid);
-            $("#txt_password").passwordbox("setValue", rows[0].password);
-            $("#txt_company_name").textbox("setText", rows[0].company_name);
+            $("#txt_password").passwordbox("setValue", rows[0].password);   
+            $("#txt_company_name").textbox("setValue", rows[0].company_name);
             $("#txt_telephone").textbox("setValue", rows[0].telephone);
             $("#txt_mailbox").textbox("setValue", rows[0].mailbox);
             $("#txt_department").textbox("setValue", rows[0].department);
             $("#date_expiretime").datebox("setValue", rows[0].expiretime);
             $("#txt_person_liable").textbox("setValue", rows[0].person_liable);
-            $("#cmb_is_person_liable").combobox("setValue", rows[0].is_person_liable),
-            $("#cmb_is_pay").combobox("setValue", rows[0].is_pay),
+            $("#cmb_is_person_liable").textbox("setValue", rows[0].is_person_liable);
+            $("#cmb_is_pay").combobox("setValue", rows[0].is_pay);
+            $("#cmb_cus_type").combobox("setValue", rows[0].customertype_name);
             $("#cmb_status").combobox("setValue", rows[0].status);
             $("#cmb_islogin").combobox("setValue", rows[0].islogin);
             $("#txt_userid").textbox("disable");
-            $("#dlg_add_user").dialog("open");
             
+
             if (rows[0].role_id_str != null) {
                 var roleIdAry = rows[0].role_id_str.split(",");
                 $("#cmb_role").combobox("setValues", roleIdAry);
             }
+            $("#dlg_add_user").dialog("open");
 
         } else {
             $.messager.alert("提示", "请选择一条用户数据！");

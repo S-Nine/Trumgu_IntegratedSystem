@@ -235,6 +235,9 @@ namespace Trumgu_IntegratedManageSystem.Controllers
 
                 item.role_str = roleName.ToString().TrimEnd(',');
                 item.role_id_str = roleId.ToString().TrimEnd(',');
+
+                var parentModel = db.xfund_t_sys_user.FirstOrDefault(m => m.id == item.parents_id);
+                if (parentModel != null) item.parents_name = parentModel.name;
             }
 
             db.Dispose();
@@ -398,6 +401,8 @@ namespace Trumgu_IntegratedManageSystem.Controllers
                     m.create_user_name = user.name;
                     m.create_user_id = user.id;
                 }
+
+                m.customertype_name = mdl.customertype_name;
 
                 m.is_person_liable = mdl.is_person_liable;
                 m.person_liable_id = mdl.person_liable_id;

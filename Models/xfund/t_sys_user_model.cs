@@ -183,6 +183,9 @@ namespace Trumgu_IntegratedManageSystem.Models.xfund
 
         [NotMapped]
         public int? endlist { get; set; }
+
+        [NotMapped]
+        public string parents_name { get; set; }
     }
 
     public class xfund_t_sys_userExObj : xfund_t_sys_userObj
