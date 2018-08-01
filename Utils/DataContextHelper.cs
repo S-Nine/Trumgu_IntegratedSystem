@@ -197,6 +197,15 @@ namespace Trumgu_IntegratedManageSystem.Utils {
 
         public DbSet<xfund_t_sys_roleObj> xfund_t_sys_role { get; set; }
 
+        /// <summary>
+        /// 机构菜单表
+        /// </summary>  
+        public DbSet<xfund_t_sys_menuObj> xfund_t_sys_menu { get; set; }
+
+        public DbSet<xfund_t_sys_buttonObj> xfund_t_sys_button { get; set; }
+
+        public DbSet<xfund_t_sys_button_rightObj> xfund_t_sys_button_right { get; set; }
+
 
     }
 }

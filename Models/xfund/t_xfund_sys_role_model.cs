@@ -16,4 +16,9 @@ namespace Trumgu_IntegratedManageSystem.Models.xfund
         public string status { get; set; }
         public int? data_authority { get; set; }
     }
+
+    public class xfund_t_sys_roleSelObj
+    {
+        public string name_like { get; set; }
+    }
 }

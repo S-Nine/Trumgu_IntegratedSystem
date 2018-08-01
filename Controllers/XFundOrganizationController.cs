@@ -1011,6 +1011,689 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             return Json(ro);
 
         }
+
+        //-----------------------------菜单管理---------------------------
+        public IActionResult MenuManager()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 不分页获取全部菜单管理（机构）列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetMenuToList()
+        {
+            var menuAry = new List<object>();
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_menu.ToList();
+            var rootAry = list.Where(rec => rec.menu_level == 1).ToList();
+            if (rootAry.Count > 0)
+            {
+                rootAry = rootAry.OrderBy(rec => rec.seq).ToList();
+                foreach (var t in rootAry)
+                {
+                    menuAry.Add(new
+                    {
+                        t.id,
+                        t.menu,
+                        t.menu_level,
+                        t.classes,
+                        t.path,
+                        t.seq,
+                        t.status,
+                        t.pathweb,
+                        t.code,
+                        children = list
+                            .Where(rec =>
+                                rec.classes != null && rec.classes != t.id.ToString() &&
+                                rec.classes.Split(new[] { '.' }).Contains(t.id.ToString()))
+                            .OrderBy(rec => rec.seq).Select(rec => new
+                            {
+                                rec.id,
+                                rec.menu,
+                                rec.menu_level,
+                                rec.classes,
+                                rec.path,
+                                rec.seq,
+                                rec.status,
+                                rec.pathweb,
+                                rec.code,
+                            }).ToList()
+                    });
+                }
+            }
+
+            db.Dispose();
+            return Json(menuAry);
+        }
+
+        /// <summary>
+        /// 不分页获取一级菜单信息列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetRootMenuToList()
+        {
+            var menuAry = new List<object> { new { id = (int?) 0, menu = "顶级菜单" } };
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_menu.Where(rec => rec.menu_level == 1)
+                .OrderBy(rec => rec.seq).Select(rec => new xfund_t_sys_menuObj()
+                {
+                    id = rec.id,
+                    menu = rec.menu
+                }).ToList();
+            if (list.Count > 0)
+            {
+                foreach (var t in list)
+                {
+                    menuAry.Add(new
+                    {
+                        t.id,
+                        t.menu
+                    });
+                }
+            }
+
+            db.Dispose();
+            return Json(menuAry);
+        }
+
+
+        /// <summary>
+        /// 添加菜单
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult AddMenu(xfund_t_sys_menuExObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var m = new xfund_t_sys_menuObj
+            {
+                menu = mdl.menu,
+                menu_level = mdl.menu_level,
+                path = mdl.path,
+                seq = mdl.seq,
+                status = mdl.status,
+                pathweb = mdl.pathweb,
+                code = mdl.code
+            };
+
+            var db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            db.xfund_t_sys_menu.Add(m);
+            if (db.SaveChanges() > 0)
+            {
+                m.classes = mdl.parent_id != null && mdl.parent_id != 0 ? mdl.parent_id + "." + m.id : m.id.ToString();
+                db.xfund_t_sys_menu.Update(m);
+                db.SaveChanges();
+                ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 修改菜单
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult UpdateMenu(xfund_t_sys_menuExObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_menu.Where(rec => rec.id == mdl.id).ToList();
+            if (list.Count == 1)
+            {
+                list[0].menu = mdl.menu;
+                list[0].menu_level = mdl.menu_level;
+                list[0].classes = mdl.parent_id != null && mdl.parent_id != 0
+                    ? mdl.parent_id + "." + mdl.id
+                    : mdl.id.ToString();
+                list[0].path = mdl.path;
+                list[0].seq = mdl.seq;
+                list[0].status = mdl.status;
+                list[0].pathweb = mdl.pathweb;
+                list[0].code = mdl.code;
+
+                db.xfund_t_sys_menu.Update(list[0]);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+
+        /// <summary>
+        /// 删除菜单
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult DeleteMenu(int id)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            if (id > 0) // 一级菜单的parent_id为0，所以禁止删除所有一级菜单
+            {
+                var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+                var list = db.xfund_t_sys_menu
+                    .Where(rec => rec.id == id || rec.classes.Contains(id.ToString() + ".")).ToList();
+
+                if (list.Count > 0)
+                {
+                    // 删除菜单下的按钮
+                    var listBtnDel = db.xfund_t_sys_button
+                        .Where(rec => list.Any(r => r.id == rec.menu_id)).ToList();
+                    if (listBtnDel.Count > 0)
+                    {
+                        db.xfund_t_sys_button.RemoveRange(listBtnDel);
+                    }
+
+                    // 删除菜单、按钮、角色管理
+                    var listRleDel = db.xfund_t_sys_button_right.Where(rec =>
+                        list.Any(r => r.id == rec.menu_id) || listBtnDel.Any(r => r.id == rec.btn_id)).ToList();
+                    if (listRleDel.Count > 0)
+                    {
+                        db.xfund_t_sys_button_right.RemoveRange(listRleDel);
+                    }
+
+                    db.xfund_t_sys_menu.RemoveRange(list);
+                    if (db.SaveChanges() > 0)
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                        ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                    }
+                    else
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                        ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                    }
+
+                    db.Dispose();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+            }
+
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 不分页获取指定菜单id的按钮列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetMenuButton(int menuId)
+        {
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+
+            var btnAry = db.xfund_t_sys_button.Where(rec => rec.menu_id == menuId).OrderBy(rec => rec.sort).ToList();
+
+            db.Dispose();
+            return Json(btnAry);
+        }
+
+        /// <summary>
+        /// 添加菜单按钮
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult AddButton(xfund_t_sys_buttonObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            db.xfund_t_sys_button.Add(mdl);
+            if (db.SaveChanges() > 0)
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 修改菜单按钮
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult UpdateButton(xfund_t_sys_buttonObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_button.Where(rec => rec.id == mdl.id).ToList();
+            if (list.Count == 1)
+            {
+                list[0].btn_js_id = mdl.btn_js_id;
+                list[0].btn_name = mdl.btn_name;
+                list[0].menu_id = mdl.menu_id;
+                list[0].sort = mdl.sort;
+
+                db.xfund_t_sys_button.Update(list[0]);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 删除菜单按钮
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult DeleteButton(int id)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            if (id > 0) // 一级菜单的parent_id为0，所以禁止删除所有一级菜单
+            {
+                var db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+                var list = db.xfund_t_sys_button.Where(rec => rec.id == id).ToList();
+                if (list.Count == 1)
+                {
+                    db.xfund_t_sys_button.Remove(list[0]);
+                    if (db.SaveChanges() > 0)
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                        ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                    }
+                    else
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                        ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                    }
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+            }
+
+            return Json(ro);
+        }
+
+        //----------------------------------角色管理(机)---------------------
+        public IActionResult RoleManager()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 不分页获取全部角色信息列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetRoleToList(xfund_t_sys_roleSelObj sel)
+        {
+            var roleAry = new List<object>();
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_role.Where(
+                rec => (string.IsNullOrWhiteSpace(sel.name_like) || rec.role.Contains(sel.name_like))
+            ).ToList();
+
+            if (list.Count > 0)
+            {
+                foreach (var t in list)
+                {
+                    roleAry.Add(new
+                    {
+                        t.id,
+                        t.role,
+                        t.rolecode,
+                        t.status,
+                        t.data_authority
+                    });
+                }
+            }
+
+            db.Dispose();
+            return Json(roleAry);
+        }
+
+        /// <summary>
+        /// 添加角色
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult AddRole(xfund_t_sys_roleObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            DataContextHelper db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            db.xfund_t_sys_role.Add(mdl);
+            if (db.SaveChanges() > 0)
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 修改角色
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult UpdateRole(xfund_t_sys_roleObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_role.Where(rec => rec.id == mdl.id).ToList();
+            if (list.Count == 1)
+            {
+                list[0].role = mdl.role;
+                list[0].rolecode = mdl.rolecode;
+                list[0].status = mdl.status;
+                list[0].data_authority = mdl.data_authority;
+
+                db.xfund_t_sys_role.Update(list[0]);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 删除角色
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult DeleteRole(int id)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_role.Where(rec => rec.id == id).ToList();
+            var listRelUser =
+                db.xfund_t_sys_role_user.Where(rec => rec.roleid == id).ToList();
+            var listRelMenu =
+                db.xfund_t_sys_button_right.Where(rec => rec.role_id == id).ToList();
+
+            if (list.Count == 1)
+            {
+                // 删除角色菜单关系
+                if (listRelMenu.Count > 0)
+                {
+                    db.xfund_t_sys_button_right.RemoveRange(listRelMenu);
+                }
+
+                // 删除角色和用户关系
+                if (listRelUser.Count > 0)
+                {
+                    db.xfund_t_sys_role_user.UpdateRange(listRelUser);
+                }
+
+                db.xfund_t_sys_role.Remove(list[0]);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 根据角色ID获取菜单权限列表 
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetRoleMenuRight(int id)
+        {
+            var treeData = new List<TreeDataObj>();
+            var db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var query1 = db.MenuTreeData.FromSql(
+                @"SELECT CONCAT('m_', a.id) AS 'id',a.id AS 'key',a.classes AS 'parent_id',a.menu AS 'text',a.menu_level AS 'level',(SELECT CASE WHEN COUNT(0) > 0 THEN 'true' ELSE 'false' END FROM t_sys_button_right r WHERE r.role_id = " +
+                id +
+                " AND r.menu_id = a.id ) AS 'check', 'menu' AS 'type', a.seq AS 'sort','' AS 'iconCls' FROM t_sys_menu a ");
+            var list1 = query1.ToList();
+            var query2 = db.MenuTreeData.FromSql(
+                @"SELECT CONCAT('b_', a.id) AS 'id', a.id AS 'key', a.menu_id AS 'parent_id', a.btn_name AS 'text', NULL AS 'level', ( SELECT CASE WHEN COUNT(0) > 0 THEN 'true' ELSE 'false' END FROM t_sys_button_right r WHERE r.role_id = " +
+                id +
+                " AND r.btn_id = a.id ) AS 'check', 'button' AS 'type', a.sort AS 'sort','' AS 'iconCls' FROM t_sys_button a ");
+            var list2 = query2.ToList();
+            var list = new List<MenuTreeDataObj>();
+            foreach (var t in list1)
+            {
+                t.parent_id = t.parent_id?.Replace("." + t.key, "");
+                if (t.parent_id == t.key.ToString())
+                {
+                    t.parent_id = "";
+                }
+            }
+
+            list.AddRange(list1); // EF使用UNION ALL 如果ID重复则数据会出现错误
+            list.AddRange(list2);
+
+            if (list.Count > 0)
+            {
+                var root = list.Where(rec => rec.level == 1 && rec.type == "menu")
+                    .OrderBy(rec => rec.sort).ToList();
+                if (root.Count > 0)
+                {
+                    foreach (var t in root)
+                    {
+                        var r = new TreeDataObj
+                        {
+                            id = t.type + "_" + t.key,
+                            text = t.text,
+                            state = "",
+                            check = t.check,
+                            iconCls = t.iconCls,
+                            attributes = t.parent_id ?? "",
+                            key = t.key,
+                            children = list.Where(rec => rec.parent_id == t.key.ToString()).Select(rec =>
+                                new TreeDataObj() // 二级菜单及一级按钮
+                                {
+                                    id = rec.type + "_" + rec.key,
+                                    text = rec.text,
+                                    state = "",
+                                    check = rec.check,
+                                    iconCls = rec.iconCls,
+                                    key = rec.key,
+                                    attributes = rec.parent_id.ToString()
+                                }).ToList()
+                        };
+
+                        if (r.children != null && r.children.Count > 0)
+                        {
+                            for (var j = 0; j < r.children.Count; j++)
+                            {
+                                r.children[j].children = list
+                                    .Where(rec => rec.parent_id == r.children[j].key.ToString()).Select(rec =>
+                                        new TreeDataObj() // 二级菜单及一级按钮
+                                        {
+                                            id = rec.type + "_" + rec.key,
+                                            text = rec.text,
+                                            state = "",
+                                            check = rec.check,
+                                            iconCls = rec.iconCls,
+                                            attributes = rec.parent_id.ToString()
+                                        }).ToList();
+                            }
+                        }
+
+                        treeData.Add(r);
+                    }
+                }
+            }
+
+            db.Dispose();
+            return Json(treeData);
+        }
+
+
+        /// <summary>
+        /// 根据角色ID分配权限 
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult DistributionRight(int role_id, List<xfund_t_sys_button_rightObj> list)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var listDelRel =
+                db.xfund_t_sys_button_right.Where(rec => rec.role_id == role_id).ToList();
+
+            if (listDelRel.Count > 0)
+            {
+                db.xfund_t_sys_button_right.RemoveRange(listDelRel);
+            }
+
+            if (list != null && list.Count > 0)
+            {
+                db.xfund_t_sys_button_right.AddRange(list);
+            }
+
+            if (db.SaveChanges() > 0)
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
     }
 
 
