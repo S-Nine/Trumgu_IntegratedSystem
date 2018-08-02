@@ -101,11 +101,6 @@ namespace Trumgu_IntegratedManageSystem.Utils {
         public DbSet<t_assets_cipher_thin_serurityObj> t_assets_cipher_thin_serurity { get; set; }
 
         /// <summary>
-        /// XFund（机构版）用户表
-        /// </summary>
-        public DbSet<xfund_t_sys_userExObj> xfund_t_sys_user { get; set; }
-
-        /// <summary>
         /// XFund（私募版）用户表
         /// </summary>
         public DbSet<xfund_t_pf_sys_userExObj> xfund_t_pf_sys_userEx { get; set; }
@@ -194,6 +189,22 @@ namespace Trumgu_IntegratedManageSystem.Utils {
         /// 私募轮播图
         /// </summary>
         public DbSet<t_pf_bannerObj> t_pf_banner { get; set; }
+
+        public DbSet<xfund_t_sys_userObj> xfund_t_sys_user { get; set; }
+
+
+        public DbSet<xfund_t_sys_role_userObj> xfund_t_sys_role_user { get; set; }
+
+        public DbSet<xfund_t_sys_roleObj> xfund_t_sys_role { get; set; }
+
+        /// <summary>
+        /// 机构菜单表
+        /// </summary>  
+        public DbSet<xfund_t_sys_menuObj> xfund_t_sys_menu { get; set; }
+
+        public DbSet<xfund_t_sys_buttonObj> xfund_t_sys_button { get; set; }
+
+        public DbSet<xfund_t_sys_button_rightObj> xfund_t_sys_button_right { get; set; }
 
 
     }

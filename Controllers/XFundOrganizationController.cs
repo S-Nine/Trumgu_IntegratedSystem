@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Expressions;
 using MySql.Data.MySqlClient;
 using Trumgu_IntegratedManageSystem.Attributes;
 using Trumgu_IntegratedManageSystem.Models;
@@ -169,6 +170,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             return Json(list);
         }
 
+        //--------------------------------用户管理----------------------------
         /// <summary>
         /// 用户管理（机构版）
         /// </summary>
@@ -182,8 +184,6 @@ namespace Trumgu_IntegratedManageSystem.Controllers
         /// </summary>
         public JsonResult GetXFundUserListToPage(xfund_t_sys_userSelObj sel)
         {
-            int total = 0;
-            List<xfund_t_sys_userExObj> users = null;
             if (sel.page == null)
             {
                 sel.page = 1;
@@ -192,63 +192,451 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             {
                 sel.rows = 15;
             }
-            Utils.DataContextHelper db = Utils.DBHelper.CreateContext(ConfigConstantHelper.trumgu_bi_db_connstr);
-            MySqlParameter[] pms = new MySqlParameter[4];
-            string sql_where = "";
-            string sql_total = "SELECT id FROM fund.t_sys_user WHERE 1=1 ";
-            string sql_list = "SELECT id,name,userid, "
-                            + " password,status,lastlogin, "
-                            + " loginip,loginsum,islogin, "
-                            + " color,macaddr,expiretime, "
-                            + " person_liable,telephone,company_name, "
-                            + " hpcompany_id,parents_id,customertype_name, "
-                            + " create_time,create_user_name,create_user_id, "
-                            + " is_person_liable,person_liable_id,is_pay, "
-                            + " mailbox,department,iscompany_show, "
-                            + " (SELECT COUNT(0) FROM trumgu_bi_db.t_xfund_user_login_info WHERE login_name=userid AND login_time > DATE_ADD(CURDATE(),INTERVAL -14 DAY)) as 'sum_week_login_num', "
-                            + " (SELECT COUNT(0) FROM trumgu_bi_db.t_xfund_user_login_info WHERE login_name=userid AND login_time > DATE_ADD(CURDATE(),INTERVAL -37 DAY)) as 'sum_year_login_num', "
-                            + " (SELECT COUNT(0) FROM trumgu_bi_db.t_xfund_user_login_info WHERE login_name=userid) as 'sum_history_login_num' "
-                            + " FROM fund.t_sys_user WHERE 1=1 ";
+            var db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_user.Where(m => true); //延迟加载,并不会去数据库查询
+            //条件查询
             if (!string.IsNullOrWhiteSpace(sel.name_like))
             {
-                pms[0] = new MySqlParameter("@name_like", MySqlDbType.VarChar) { Value = "%" + sel.name_like + "%" };
-                sql_where += " AND name LIKE @name_like";
+                list = list.Where(m => m.name.Contains(sel.name_like));
             }
-            if (!string.IsNullOrWhiteSpace(sel.company_name_like))
-            {
-                pms[1] = new MySqlParameter("@company_name_like", MySqlDbType.VarChar) { Value = "%" + sel.company_name_like + "%" };
-                sql_where += " AND company_name LIKE @company_name_like";
-            }
-            if (!string.IsNullOrWhiteSpace(sel.person_liable_like))
-            {
-                pms[2] = new MySqlParameter("@person_liable_like", MySqlDbType.VarChar) { Value = "%" + sel.person_liable_like + "%" };
-                sql_where += " AND person_liable LIKE @person_liable_like";
-            }
+
             if (!string.IsNullOrWhiteSpace(sel.userid_like))
             {
-                pms[3] = new MySqlParameter("@userid_like", MySqlDbType.VarChar) { Value = "%" + sel.userid_like + "%" };
-                sql_where += " AND userid LIKE @userid_like";
+                list = list.Where(m => m.userid.Contains(sel.userid_like));
             }
 
-            sql_total += sql_where;
-            sql_list += sql_where + " ORDER BY id DESC LIMIT " + ((sel.page - 1) * sel.rows) + "," + sel.rows;
-
-            total = db.xfund_t_sys_user.FromSql(sql_total, pms).Count();
-            if (total > 0)
+            if (!string.IsNullOrWhiteSpace(sel.company_name_like))
             {
-                users = db.xfund_t_sys_user.FromSql(sql_list, pms).ToList();
+                list = list.Where(m => m.company_name.Contains(sel.company_name_like));
             }
 
+            if (!string.IsNullOrWhiteSpace(sel.person_liable_like))
+            {
+                list = list.Where(m => m.person_liable.Contains(sel.person_liable_like));
+            }
+            var total = list.Count();
+            //分页
+            list = list.OrderByDescending(m => m.id)
+                .Skip(Convert.ToInt32((sel.rows * (sel.page - 1))))
+                .Take(Convert.ToInt32(sel.rows));
+            var users = list.ToList();
+            foreach (var item in users)
+            {
+                //根据userid得到关系表List
+                var listRoleUser = db.xfund_t_sys_role_user.Where(m => m.userid == item.id).ToList();
+                var roleId = new StringBuilder();
+                var roleName = new StringBuilder();
+                foreach (var roleUser in listRoleUser)
+                {
+                    var role = db.xfund_t_sys_role.FirstOrDefault(m => m.id == roleUser.roleid);
+                    roleId.Append(roleUser.roleid + ",");
+                    if (role != null) roleName.Append(role.role + ",");
+                }
 
+                item.role_str = roleName.ToString().TrimEnd(',');
+                item.role_id_str = roleId.ToString().TrimEnd(',');
+
+                var parentModel = db.xfund_t_sys_user.FirstOrDefault(m => m.id == item.parents_id);
+                if (parentModel != null) item.parents_name = parentModel.name;
+            }
 
             db.Dispose();
-            if (users == null)
-            {
-                users = new List<xfund_t_sys_userExObj>();
-            }
-            return Json(new { total = total, rows = users });
+            return Json(new { total, rows = users });
+
         }
 
+        /// <summary>
+        /// 获取机构版推荐用户名
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult GetXFundNewUserid()
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_dictionaries.Where(rec => rec.code == "J0000000")
+                .ToList();
+
+            if (list.Count == 1)
+            {
+                var v = list[0].value;
+                var nextLoginNum = "J";
+                if (!string.IsNullOrWhiteSpace(v) && int.TryParse(v.Substring(1), out var iNum))
+                {
+                    for (var i = iNum.ToString().Length; i < 7; i++)
+                    {
+                        nextLoginNum += "0";
+                    }
+
+                    list[0].value = nextLoginNum + (iNum + 1);
+                    db.xfund_t_sys_dictionaries.Update(list[0]);
+                    db.SaveChanges();
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                    ro.data = nextLoginNum + (iNum + 1);
+                }
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 获取机构版角色列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetXFundRoleToList()
+        {
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_role.ToList();
+            db.Dispose();
+            return Json(list);
+        }
+
+        /// <summary>
+        /// 添加XFund用户
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult AddXFundUser(xfund_t_sys_userObj mdl, List<int> role_id_ary)
+        {
+            t_sys_userObj user = null;
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            var cUserInfo = HttpContext.Session.GetString("UserInfo");
+            if (!string.IsNullOrWhiteSpace(cUserInfo))
+            {
+                user = Newtonsoft.Json.JsonConvert.DeserializeObject<t_sys_userObj>(cUserInfo);
+            }
+
+            mdl.password = AESHelper.GetMD5(mdl.password);
+            mdl.islogin = 1;
+            mdl.loginsum = 0;
+            mdl.create_time = DateTime.Now;
+            if (user != null) mdl.create_user_name = user.name;
+            if (user != null) mdl.create_user_id = user.id;
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            if (db.xfund_t_sys_user.Count(m => m.userid == mdl.userid) <= 0)
+            {
+                db.xfund_t_sys_user.Add(mdl);
+                if (db.SaveChanges() > 0)
+                {
+                    if (role_id_ary != null && role_id_ary.Count > 0)
+                    {
+                        var listRole = new List<xfund_t_sys_role_userObj>();
+                        foreach (var t in role_id_ary)
+                        {
+                            listRole.Add(new xfund_t_sys_role_userObj
+                            {
+                                roleid = t,
+                                userid = mdl.id
+                            });
+                        }
+                        db.xfund_t_sys_role_user.AddRange(listRole);
+                        db.SaveChanges();
+                    }
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+                ro.data = "该账号已经存在！";
+            }
+
+            db.Dispose();
+            return Json(ro);
+
+        }
+
+        /// <summary>
+        /// 修改XFund用户
+        /// </summary>
+        /// <param name="mdl"></param>
+        /// <param name="role_id_ary"></param>
+        /// <returns></returns>
+        public JsonResult UpdateXFundUser(xfund_t_sys_userObj mdl, List<int> role_id_ary)
+        {
+            t_sys_userObj user = null;
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            var cUserInfo = HttpContext.Session.GetString("UserInfo");
+            if (!string.IsNullOrWhiteSpace(cUserInfo))
+            {
+                user = Newtonsoft.Json.JsonConvert.DeserializeObject<t_sys_userObj>(cUserInfo);
+            }
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var m = db.xfund_t_sys_user.FirstOrDefault(rec => rec.id == mdl.id);
+            if (m != null)
+            {
+                m.name = mdl.name;
+                m.status = mdl.status;
+                m.islogin = mdl.islogin;
+                m.expiretime = mdl.expiretime;
+                m.person_liable = mdl.person_liable;
+                m.telephone = mdl.telephone;
+                m.company_name = mdl.company_name;
+                m.create_time = DateTime.Now;
+                if (user != null)
+                {
+                    m.create_user_name = user.name;
+                    m.create_user_id = user.id;
+                }
+
+                m.customertype_name = mdl.customertype_name;
+
+                m.is_person_liable = mdl.is_person_liable;
+                m.person_liable_id = mdl.person_liable_id;
+                m.mailbox = mdl.mailbox;
+                m.department = mdl.department;
+                m.is_pay = mdl.is_pay;
+
+                db.xfund_t_sys_user.Update(m);
+
+                // 删除旧角色关系
+                var listRoleDel =
+                    db.xfund_t_sys_role_user.Where(rec => rec.userid == m.id).ToList();
+                db.xfund_t_sys_role_user.RemoveRange(listRoleDel);
+                // 添加新角色关系
+                if (role_id_ary != null && role_id_ary.Count > 0)
+                {
+                    var listRole = new List<xfund_t_sys_role_userObj>();
+                    foreach (var t in role_id_ary)
+                    {
+                        listRole.Add(new xfund_t_sys_role_userObj()
+                        {
+                            roleid = t,
+                            userid = m.id
+                        });
+                    }
+
+                    db.xfund_t_sys_role_user.AddRange(listRole);
+                }
+
+
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+                ro.data = "该账号不存在！";
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 删除XFund用户
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public JsonResult DeleteXFundUser(int id)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var del = db.xfund_t_sys_user.FirstOrDefault(rec => rec.id == id);
+            if (del != null)
+            {
+
+
+                db.xfund_t_sys_user.Remove(del);
+                var listRole =
+                    db.xfund_t_sys_role_user.Where(rec => rec.userid == id).ToList();
+                if (listRole.Count > 0)
+                {
+                    db.xfund_t_sys_role_user.RemoveRange(listRole);
+                }
+
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <param name="mdls"></param>
+        /// <param name="role_id"></param>
+        /// <returns></returns>
+        public JsonResult AddBatchXFundUser(xfund_t_sys_userObj mdls, int role_id)
+        {
+            t_sys_userObj user = null;
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            var cUserInfo = HttpContext.Session.GetString("UserInfo");
+            if (!string.IsNullOrWhiteSpace(cUserInfo))
+            {
+                user = Newtonsoft.Json.JsonConvert.DeserializeObject<t_sys_userObj>(cUserInfo);
+            }
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            if (mdls.startlist != null && mdls.endlist != null)
+            {
+                var list = new List<xfund_t_sys_userObj>();
+                var listRole = new List<xfund_t_sys_role_userObj>();
+                for (var i = mdls.startlist; i < mdls.endlist + 1; i++)
+                {
+                    var mdl = new xfund_t_sys_userObj
+                    {
+                        name = mdls.userid + i,
+                        userid = mdls.userid + i,
+                        password = AESHelper.GetMD5(mdls.password),
+                        person_liable = mdls.person_liable,
+                        expiretime = mdls.expiretime,
+                        company_name = mdls.company_name,
+                        islogin = 1,
+                        loginsum = 0,
+                        create_time = DateTime.Now
+                    };
+                    if (user != null) mdl.create_user_name = user.name;
+                    if (user != null) mdl.create_user_id = user.id;
+
+                    var existCount = db.xfund_t_sys_user.Count(m => m.userid == mdl.userid);
+                    if (existCount > 0)
+                    {
+                        //如果存在相同账号,直接return
+                        ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                        ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+                        ro.data = "该账号已经存在！";
+                        return Json(ro);
+
+                    }
+
+                    list.Add(mdl);
+                    var roleMdl = new xfund_t_sys_role_userObj
+                    {
+                        userid = mdl.id,
+                        roleid = role_id
+                    };
+                    listRole.Add(roleMdl);
+
+                }
+
+                db.xfund_t_sys_user.AddRange(list);
+                db.xfund_t_sys_role_user.AddRange(listRole);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 修改登陆状态
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public JsonResult UpdateUserState(int id)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var model = db.xfund_t_sys_user.FirstOrDefault(rec => rec.id == id);
+            if (model != null)
+            {
+                model.islogin = model.islogin == 0 ? 1 : 0;
+                db.xfund_t_sys_user.Update(model);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        public JsonResult GetCusType()
+        {
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_dictionaries.Where(m => m.parentCode == "CustomerType").ToList();
+            db.Dispose();
+            return Json(list);
+        }
+
+
+
+        //---------------------------------尽调上传---------------------------------
         /// <summary>
         /// 私募公司尽调上传页面
         /// </summary>
@@ -515,7 +903,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
         /// <returns></returns>
         public JsonResult GetCompanyInfo(string code)
         {
-            
+
             var ro = new xfund_t_fund_companyExObj();
             var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
             var model = db.xfund_t_fund_company.FirstOrDefault(m => m.regis_code == code);
@@ -623,8 +1011,691 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             return Json(ro);
 
         }
+
+        //-----------------------------菜单管理---------------------------
+        public IActionResult MenuManager()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 不分页获取全部菜单管理（机构）列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetMenuToList()
+        {
+            var menuAry = new List<object>();
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_menu.ToList();
+            var rootAry = list.Where(rec => rec.menu_level == 1).ToList();
+            if (rootAry.Count > 0)
+            {
+                rootAry = rootAry.OrderBy(rec => rec.seq).ToList();
+                foreach (var t in rootAry)
+                {
+                    menuAry.Add(new
+                    {
+                        t.id,
+                        t.menu,
+                        t.menu_level,
+                        t.classes,
+                        t.path,
+                        t.seq,
+                        t.status,
+                        t.pathweb,
+                        t.code,
+                        children = list
+                            .Where(rec =>
+                                rec.classes != null && rec.classes != t.id.ToString() &&
+                                rec.classes.Split(new[] { '.' }).Contains(t.id.ToString()))
+                            .OrderBy(rec => rec.seq).Select(rec => new
+                            {
+                                rec.id,
+                                rec.menu,
+                                rec.menu_level,
+                                rec.classes,
+                                rec.path,
+                                rec.seq,
+                                rec.status,
+                                rec.pathweb,
+                                rec.code,
+                            }).ToList()
+                    });
+                }
+            }
+
+            db.Dispose();
+            return Json(menuAry);
+        }
+
+        /// <summary>
+        /// 不分页获取一级菜单信息列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetRootMenuToList()
+        {
+            var menuAry = new List<object> { new { id = (int?) 0, menu = "顶级菜单" } };
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_menu.Where(rec => rec.menu_level == 1)
+                .OrderBy(rec => rec.seq).Select(rec => new xfund_t_sys_menuObj()
+                {
+                    id = rec.id,
+                    menu = rec.menu
+                }).ToList();
+            if (list.Count > 0)
+            {
+                foreach (var t in list)
+                {
+                    menuAry.Add(new
+                    {
+                        t.id,
+                        t.menu
+                    });
+                }
+            }
+
+            db.Dispose();
+            return Json(menuAry);
+        }
+
+
+        /// <summary>
+        /// 添加菜单
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult AddMenu(xfund_t_sys_menuExObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var m = new xfund_t_sys_menuObj
+            {
+                menu = mdl.menu,
+                menu_level = mdl.menu_level,
+                path = mdl.path,
+                seq = mdl.seq,
+                status = mdl.status,
+                pathweb = mdl.pathweb,
+                code = mdl.code
+            };
+
+            var db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            db.xfund_t_sys_menu.Add(m);
+            if (db.SaveChanges() > 0)
+            {
+                m.classes = mdl.parent_id != null && mdl.parent_id != 0 ? mdl.parent_id + "." + m.id : m.id.ToString();
+                db.xfund_t_sys_menu.Update(m);
+                db.SaveChanges();
+                ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 修改菜单
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult UpdateMenu(xfund_t_sys_menuExObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_menu.Where(rec => rec.id == mdl.id).ToList();
+            if (list.Count == 1)
+            {
+                list[0].menu = mdl.menu;
+                list[0].menu_level = mdl.menu_level;
+                list[0].classes = mdl.parent_id != null && mdl.parent_id != 0
+                    ? mdl.parent_id + "." + mdl.id
+                    : mdl.id.ToString();
+                list[0].path = mdl.path;
+                list[0].seq = mdl.seq;
+                list[0].status = mdl.status;
+                list[0].pathweb = mdl.pathweb;
+                list[0].code = mdl.code;
+
+                db.xfund_t_sys_menu.Update(list[0]);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+
+        /// <summary>
+        /// 删除菜单
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult DeleteMenu(int id)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            if (id > 0) // 一级菜单的parent_id为0，所以禁止删除所有一级菜单
+            {
+                var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+                var list = db.xfund_t_sys_menu
+                    .Where(rec => rec.id == id || rec.classes.Contains(id.ToString() + ".")).ToList();
+
+                if (list.Count > 0)
+                {
+                    // 删除菜单下的按钮
+                    var listBtnDel = db.xfund_t_sys_button
+                        .Where(rec => list.Any(r => r.id == rec.menu_id)).ToList();
+                    if (listBtnDel.Count > 0)
+                    {
+                        db.xfund_t_sys_button.RemoveRange(listBtnDel);
+                    }
+
+                    // 删除菜单、按钮、角色管理
+                    var listRleDel = db.xfund_t_sys_button_right.Where(rec =>
+                        list.Any(r => r.id == rec.menu_id) || listBtnDel.Any(r => r.id == rec.btn_id)).ToList();
+                    if (listRleDel.Count > 0)
+                    {
+                        db.xfund_t_sys_button_right.RemoveRange(listRleDel);
+                    }
+
+                    db.xfund_t_sys_menu.RemoveRange(list);
+                    if (db.SaveChanges() > 0)
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                        ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                    }
+                    else
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                        ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                    }
+
+                    db.Dispose();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+            }
+
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 不分页获取指定菜单id的按钮列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetMenuButton(int menuId)
+        {
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+
+            var btnAry = db.xfund_t_sys_button.Where(rec => rec.menu_id == menuId).OrderBy(rec => rec.sort).ToList();
+
+            db.Dispose();
+            return Json(btnAry);
+        }
+
+        /// <summary>
+        /// 添加菜单按钮
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult AddButton(xfund_t_sys_buttonObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            db.xfund_t_sys_button.Add(mdl);
+            if (db.SaveChanges() > 0)
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 修改菜单按钮
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult UpdateButton(xfund_t_sys_buttonObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_button.Where(rec => rec.id == mdl.id).ToList();
+            if (list.Count == 1)
+            {
+                list[0].btn_js_id = mdl.btn_js_id;
+                list[0].btn_name = mdl.btn_name;
+                list[0].menu_id = mdl.menu_id;
+                list[0].sort = mdl.sort;
+
+                db.xfund_t_sys_button.Update(list[0]);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 删除菜单按钮
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult DeleteButton(int id)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+            if (id > 0) // 一级菜单的parent_id为0，所以禁止删除所有一级菜单
+            {
+                var db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+                var list = db.xfund_t_sys_button.Where(rec => rec.id == id).ToList();
+                if (list.Count == 1)
+                {
+                    db.xfund_t_sys_button.Remove(list[0]);
+                    if (db.SaveChanges() > 0)
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                        ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                    }
+                    else
+                    {
+                        ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                        ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                    }
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_PARAMETER;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_PARAMETER.ToString();
+            }
+
+            return Json(ro);
+        }
+
+        //----------------------------------角色管理(机)---------------------
+        public IActionResult RoleManager()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 不分页获取全部角色信息列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetRoleToList(xfund_t_sys_roleSelObj sel)
+        {
+            var roleAry = new List<object>();
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_role.Where(
+                rec => (string.IsNullOrWhiteSpace(sel.name_like) || rec.role.Contains(sel.name_like))
+            ).ToList();
+
+            if (list.Count > 0)
+            {
+                foreach (var t in list)
+                {
+                    roleAry.Add(new
+                    {
+                        t.id,
+                        t.role,
+                        t.rolecode,
+                        t.status,
+                        t.data_authority
+                    });
+                }
+            }
+
+            db.Dispose();
+            return Json(roleAry);
+        }
+
+        /// <summary>
+        /// 添加角色
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult AddRole(xfund_t_sys_roleObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            DataContextHelper db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            db.xfund_t_sys_role.Add(mdl);
+            if (db.SaveChanges() > 0)
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 修改角色
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult UpdateRole(xfund_t_sys_roleObj mdl)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_role.Where(rec => rec.id == mdl.id).ToList();
+            if (list.Count == 1)
+            {
+                list[0].role = mdl.role;
+                list[0].rolecode = mdl.rolecode;
+                list[0].status = mdl.status;
+                list[0].data_authority = mdl.data_authority;
+
+                db.xfund_t_sys_role.Update(list[0]);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 删除角色
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult DeleteRole(int id)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var list = db.xfund_t_sys_role.Where(rec => rec.id == id).ToList();
+            var listRelUser =
+                db.xfund_t_sys_role_user.Where(rec => rec.roleid == id).ToList();
+            var listRelMenu =
+                db.xfund_t_sys_button_right.Where(rec => rec.role_id == id).ToList();
+
+            if (list.Count == 1)
+            {
+                // 删除角色菜单关系
+                if (listRelMenu.Count > 0)
+                {
+                    db.xfund_t_sys_button_right.RemoveRange(listRelMenu);
+                }
+
+                // 删除角色和用户关系
+                if (listRelUser.Count > 0)
+                {
+                    db.xfund_t_sys_role_user.UpdateRange(listRelUser);
+                }
+
+                db.xfund_t_sys_role.Remove(list[0]);
+                if (db.SaveChanges() > 0)
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                    ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+                }
+                else
+                {
+                    ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                    ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+                }
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_NOT_FOUND.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
+
+        /// <summary>
+        /// 根据角色ID获取菜单权限列表 
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetRoleMenuRight(int id)
+        {
+            var treeData = new List<TreeDataObj>();
+            var db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var query1 = db.MenuTreeData.FromSql(
+                @"SELECT CONCAT('m_', a.id) AS 'id',a.id AS 'key',a.classes AS 'parent_id',a.menu AS 'text',a.menu_level AS 'level',(SELECT CASE WHEN COUNT(0) > 0 THEN 'true' ELSE 'false' END FROM t_sys_button_right r WHERE r.role_id = " +
+                id +
+                " AND r.menu_id = a.id ) AS 'check', 'menu' AS 'type', a.seq AS 'sort','' AS 'iconCls' FROM t_sys_menu a ");
+            var list1 = query1.ToList();
+            var query2 = db.MenuTreeData.FromSql(
+                @"SELECT CONCAT('b_', a.id) AS 'id', a.id AS 'key', a.menu_id AS 'parent_id', a.btn_name AS 'text', NULL AS 'level', ( SELECT CASE WHEN COUNT(0) > 0 THEN 'true' ELSE 'false' END FROM t_sys_button_right r WHERE r.role_id = " +
+                id +
+                " AND r.btn_id = a.id ) AS 'check', 'button' AS 'type', a.sort AS 'sort','' AS 'iconCls' FROM t_sys_button a ");
+            var list2 = query2.ToList();
+            var list = new List<MenuTreeDataObj>();
+            foreach (var t in list1)
+            {
+                t.parent_id = t.parent_id?.Replace("." + t.key, "");
+                if (t.parent_id == t.key.ToString())
+                {
+                    t.parent_id = "";
+                }
+            }
+
+            list.AddRange(list1); // EF使用UNION ALL 如果ID重复则数据会出现错误
+            list.AddRange(list2);
+
+            if (list.Count > 0)
+            {
+                var root = list.Where(rec => rec.level == 1 && rec.type == "menu")
+                    .OrderBy(rec => rec.sort).ToList();
+                if (root.Count > 0)
+                {
+                    foreach (var t in root)
+                    {
+                        var r = new TreeDataObj
+                        {
+                            id = t.type + "_" + t.key,
+                            text = t.text,
+                            state = "",
+                            check = t.check,
+                            iconCls = t.iconCls,
+                            attributes = t.parent_id ?? "",
+                            key = t.key,
+                            children = list.Where(rec => rec.parent_id == t.key.ToString()).Select(rec =>
+                                new TreeDataObj() // 二级菜单及一级按钮
+                                {
+                                    id = rec.type + "_" + rec.key,
+                                    text = rec.text,
+                                    state = "",
+                                    check = rec.check,
+                                    iconCls = rec.iconCls,
+                                    key = rec.key,
+                                    attributes = rec.parent_id.ToString()
+                                }).ToList()
+                        };
+
+                        if (r.children != null && r.children.Count > 0)
+                        {
+                            for (var j = 0; j < r.children.Count; j++)
+                            {
+                                r.children[j].children = list
+                                    .Where(rec => rec.parent_id == r.children[j].key.ToString()).Select(rec =>
+                                        new TreeDataObj() // 二级菜单及一级按钮
+                                        {
+                                            id = rec.type + "_" + rec.key,
+                                            text = rec.text,
+                                            state = "",
+                                            check = rec.check,
+                                            iconCls = rec.iconCls,
+                                            attributes = rec.parent_id.ToString()
+                                        }).ToList();
+                            }
+                        }
+
+                        treeData.Add(r);
+                    }
+                }
+            }
+
+            db.Dispose();
+            return Json(treeData);
+        }
+
+
+        /// <summary>
+        /// 根据角色ID分配权限 
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult DistributionRight(int role_id, List<xfund_t_sys_button_rightObj> list)
+        {
+            var ro = new ResultObj()
+            {
+                code = (int)EResponseState.TRUMGU_IMS_ERROR_INTERNAL,
+                msg = EResponseState.TRUMGU_IMS_ERROR_INTERNAL.ToString()
+            };
+
+            var db = DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
+            var listDelRel =
+                db.xfund_t_sys_button_right.Where(rec => rec.role_id == role_id).ToList();
+
+            if (listDelRel.Count > 0)
+            {
+                db.xfund_t_sys_button_right.RemoveRange(listDelRel);
+            }
+
+            if (list != null && list.Count > 0)
+            {
+                db.xfund_t_sys_button_right.AddRange(list);
+            }
+
+            if (db.SaveChanges() > 0)
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_SUCCESS;
+                ro.msg = EResponseState.TRUMGU_IMS_SUCCESS.ToString();
+            }
+            else
+            {
+                ro.code = (int)EResponseState.TRUMGU_IMS_ERROR_SAVE;
+                ro.msg = EResponseState.TRUMGU_IMS_ERROR_SAVE.ToString();
+            }
+
+            db.Dispose();
+            return Json(ro);
+        }
     }
 
 
-    
+
 }

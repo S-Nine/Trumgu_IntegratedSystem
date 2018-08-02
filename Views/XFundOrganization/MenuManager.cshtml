@@ -1,0 +1,92 @@
+﻿@using Trumgu_IntegratedManageSystem.Utils
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>菜单</title>
+    <link rel="stylesheet" type="text/css" href="~/css/layout.css">
+    <link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="~/lib/jquery-easyui-1-5-4-2/themes/icon.css">
+    <script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.min.js"></script>
+    <script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="~/lib/jquery-easyui-1-5-4-2/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="~/js/utils/tools.js"></script>
+    <script type="text/javascript" src="~/js/utils/config.js"></script>
+    <script type="text/javascript" src="~/js/utils/easyui-extend.js"></script>
+</head>
+<body style="height:100%;overflow:hidden;">
+    <div class="content" style="padding: 40px 0 0;">
+        <div class="operation_area" style="height:40px;">
+            <!-- <div class="easyui-panel" style="padding:5px;height:80px;width:100%;">
+            </div> -->
+            @Html.Partial("../Shared/_ButtonTools.cshtml")
+        </div>
+        <div class="datagrid_area" style="width:50%;display:inline-block;">
+            <table id="menu_treegrid" title="菜单列表"></table>
+        </div>
+        <div class="datagrid_area" style="width:50%;float: right;display:inline-block;">
+            <table id="button_datagrid" title="按钮列表"></table>
+        </div>
+    </div>
+    <div id="dlg_add_menu" class="easyui-dialog" title="编辑菜单" style="width:310px;height:300px;padding:5px;"
+         data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">
+        <input type="hidden" id="hid_menu_id" value="" />
+        <div style="margin-top:10px;">
+            <span>上级菜单：</span>
+            <select id="cmb_parent_id" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false,url:'/PFXFundOrganization/GetRootMenuToList/',valueField:'id',textField:'menu'"></select>&nbsp;&nbsp;<span style="color:red;">*</span>
+        </div>
+        <div style="margin-top:5px;">
+            <span>菜单名称：</span>
+            <input id="txt_name" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,20]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+        </div>
+        <div style="margin-top:5px;">
+            <span>菜单编码：</span>
+            <input id="txt_code" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,20]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+        </div>
+        <div style="margin-top:5px;">
+            <span>菜单图标：</span>
+            <input id="txt_icon" class="easyui-textbox" data-options="validType:['length[0,100]']" style="width:200px">
+        </div>
+        <div style="margin-top:5px;">
+            <span>菜单排序：</span>
+            <input id="txt_sort" class="easyui-textbox easyui-validatebox" data-options="validType:['integer']" style="width:200px">
+        </div>
+        <div style="margin-top:5px;">
+            <span>菜单状态：</span>
+            <select id="cmb_state" class="easyui-combobox" name="dept" style="width:200px;" data-options="editable:false">
+                <option value="1">启用</option>
+                <option value="0">禁用</option>
+            </select>&nbsp;&nbsp;<span style="color:red;">*</span>
+        </div>
+        <div style="margin-top:5px;">
+            <span>菜单路径：</span>
+            <input id="txt_path" class="easyui-textbox" data-options="validType:['length[0,100]']" style="width:200px">
+        </div>
+    </div>
+    <div id="dlg_add_button" class="easyui-dialog" title="编辑按钮" style="width:310px;height:215px;padding:5px;"
+         data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">
+        <input type="hidden" id="hid_button_id" value="" />
+        <input type="hidden" id="hid_btn_menu_id" value="" />
+        <div style="margin-top:10px;">
+            <span>&nbsp;&nbsp;所属菜单：</span>
+            <input id="txt_btn_menu_name" class="easyui-textbox easyui-validatebox" data-options="disabled:true" style="width:200px">
+        </div>
+        <div style="margin-top:5px;">
+            <span>按钮Code：</span>
+            <input id="txt_btn_code" class="easyui-textbox easyui-validatebox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+        </div>
+        <div style="margin-top:5px;">
+            <span>&nbsp;&nbsp;按钮名称：</span>
+            <input id="txt_btn_name" class="easyui-textbox" data-options="required:true,validType:['length[0,100]']" style="width:200px">&nbsp;&nbsp;<span style="color:red;">*</span>
+        </div>
+        <div style="margin-top:5px;">
+            <span>&nbsp;&nbsp;按钮排序：</span>
+            <input id="txt_btn_sort" class="easyui-textbox easyui-validatebox" data-options="validType:['integer']" style="width:200px">
+        </div>
+    </div>
+    <script type="text/javascript" src="~/js/xfund_organization/menu_manager.js?t=@DateTime.Now.ToFileTimeUtc()"></script>
+</body>
+</html>
