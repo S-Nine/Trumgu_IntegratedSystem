@@ -1,8 +1,9 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Trumgu_IntegratedManageSystem.Models.xfund
 {
-
+    [Table("t_sys_user", Schema = "fund")]
     public class xfund_t_sys_userObj
     {
         private int? _id = null;
@@ -163,6 +164,28 @@ namespace Trumgu_IntegratedManageSystem.Models.xfund
         /// 消息是否显示公司名称（0：是，1否）
         /// </summary>
         public int? iscompany_show { get { return _iscompany_show; } set { _iscompany_show = value; } }
+
+        /// <summary>
+        /// 角色ID字符串（半角","分割）
+        /// </summary>
+        [NotMapped]
+        public string role_id_str { get; set; }
+
+
+        /// <summary>
+        /// 角色字符串（半角","分割）
+        /// </summary>
+        [NotMapped]
+        public string role_str { get; set; }
+
+        [NotMapped]
+        public int? startlist { get; set; }
+
+        [NotMapped]
+        public int? endlist { get; set; }
+
+        [NotMapped]
+        public string parents_name { get; set; }
     }
 
     public class xfund_t_sys_userExObj : xfund_t_sys_userObj
@@ -184,6 +207,9 @@ namespace Trumgu_IntegratedManageSystem.Models.xfund
         /// 上周登录次数
         /// </summary>
         public int? sum_week_login_num { get; set; }
+
+       
+
     }
 
     public class xfund_t_sys_userSelObj

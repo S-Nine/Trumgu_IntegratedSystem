@@ -345,7 +345,7 @@ namespace Trumgu_IntegratedManageSystem.Controllers
             }
 
             Utils.DataContextHelper db = Utils.DBHelper.CreateContext(ConfigConstantHelper.fund_connstr);
-            List<xfund_t_sys_dictionariesObj> list = db.xfund_t_sys_dictionaries.Where(rec => rec.code == "J0000000")
+            List<xfund_t_sys_dictionariesObj> list = db.xfund_t_sys_dictionaries.Where(rec => rec.code == "S0000000")
                 .ToList();
 
             if (list != null && list.Count == 1)

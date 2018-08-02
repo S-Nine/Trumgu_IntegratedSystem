@@ -1,6 +1,7 @@
 using System;
 
 namespace Trumgu_IntegratedManageSystem.Models.sys {
+
     public class t_sys_userObj {
         private int? _id = null;
         /// <summary>
